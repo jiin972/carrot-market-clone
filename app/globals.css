@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@plugin "@tailwindcss/forms"; /*플러그인 추가*/
+
+@utility my-flex {
+  @apply flex items-center justify-center;
 }
 
 @theme inline {
@@ -10,17 +11,48 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-carrot-text: var(--text-base-color);
+  --color-carrot-link: var(--link-base-color);
+  --color-carrot-bg: var(--bg-base-color);
+  --color-carrot-hover-bg: var(--bg-hover-base-color);
+}
+
+@utility btn-primary {
+  @apply w-full h-10 flex items-center justify-center bg-carrot-bg text-white 
+   font-medium rounded-md hover:bg-orange-400 transition-colors;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --text-base-color: #171717;
+  --link-base-color: var(--color-orange-500);
+  --bg-base-color: var(--color-orange-500);
+  --bg-hover-base-color: var(--color-orange-400);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: oklch(14.7% 0.004 49.25);
     --foreground: #ededed;
+    --text-base-color: var(--color-white);
+    --link-base-color: var(--color-orange-500);
+    --bg-base-color: var(--color-orange-500);
+    --bg-hover-base-color: var(--color-orange-400);
   }
 }
 
 body {
   background: var(--background);
-  color: var(--foreground);
+  color: var(--text-base-color);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer base {
+  body a {
+    color: var(--link-base-color);
+  }
+  a:hover {
+    text-underline-offset: 4px;
+  }
 }
