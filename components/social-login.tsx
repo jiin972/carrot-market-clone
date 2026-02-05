@@ -35,7 +35,6 @@ export default function SocialLogin() {
           <span>Continue with SMS</span>
         </Link>
       </div>
-      1{" "}
     </>
   );
 }
