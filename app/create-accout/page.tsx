@@ -21,7 +21,6 @@ export default function CreateAccount() {
           type="text"
           placeholder="Username"
           errors={state?.fieldErrors.username}
-          defaultValue={state?.payload?.username ?? ""}
         />
         <FormInput
           name="email"
