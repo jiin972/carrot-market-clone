@@ -1,13 +1,14 @@
 "use client";
 
-import FormButton from "@/components/form-button";
-import FormInput from "@/components/form-input";
+import Button from "@/components/button";
+import Input from "@/components/input";
 import SocialLogin from "@/components/social-login";
+import { PASSWORD_MIN_LENGTH } from "@/lib/constants";
 import { useActionState } from "react";
-import { handleForm } from "./actions";
+import { login } from "./actions";
 
-export default function Login() {
-  const [state, dispatch] = useActionState(handleForm, null);
+export default function LogIn() {
+  const [state, dispatch] = useActionState(login, null);
   return (
     <div className="flex flex-col gap-10 py-8 px-6 ">
       <div className="flex flex-col gap-2 *:font-medium">
@@ -15,14 +16,15 @@ export default function Login() {
         <h2 className="text-xl">Log in with email and password.</h2>
       </div>
       <form action={dispatch} className="flex flex-col gap-2 ">
-        <FormInput name="email" required type="email" placeholder="Email" />
-        <FormInput
+        <Input name="email" required type="email" placeholder="Email" />
+        <Input
           name="password"
           required
           type="password"
           placeholder="Password"
+          minLength={PASSWORD_MIN_LENGTH}
         />
-        <FormButton text="Log in" />
+        <Button text="Log in" />
       </form>
       <SocialLogin />
     </div>

@@ -1,5 +1,10 @@
 "use server";
 
+import {
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_REGEX,
+  PASSWORD_REGEX_ERROR,
+} from "@/lib/constants";
 import { z } from "zod";
 
 const checkUsername = (username: string) => !username.includes("potato");
@@ -12,17 +17,20 @@ const formSchema = z
       .string()
       .min(1, "필수 입력입니다.")
       .min(5, "5자 이상으로 입력합니다.")
-      .max(10, "10자 이하로 입력합니다.")
+      // .max(10, "10자 이하로 입력합니다.")
+      .trim()
+      .transform((username) => `🔥${username}🔥`)
       .refine(checkUsername, "'potato'란 단어는 허용되지 않습니다."),
-    email: z.email("이메일 형식이 아닙니다."), //z.string()없어도 email은 ok.
+    email: z
+      .email("이메일 형식이 아닙니다.") //z.string()없어도 email은 ok.//
+      .toLowerCase(),
     password: z
       .string()
-      .min(5, "5자 이상으로 입력합니다.")
-      .max(10, "10자 이하로 입력합니다."),
+      .min(PASSWORD_MIN_LENGTH, "5자 이상으로 입력합니다.")
+      .regex(PASSWORD_REGEX, PASSWORD_REGEX_ERROR),
     confirm_password: z
       .string()
-      .min(5, "5자 이상으로 입력합니다.")
-      .max(10, "10자 이하로 입력합니다."),
+      .min(PASSWORD_MIN_LENGTH, "5자 이상으로 입력합니다."),
   })
   .refine(checkPassword, {
     message: "비밀번호가 일치하지 않습니다.",
@@ -43,5 +51,7 @@ export const createAccount = async (prevState: any, formData: FormData) => {
     return {
       fieldErrors: flatten.fieldErrors,
     };
+  } else {
+    console.log(result.data);
   }
 };
