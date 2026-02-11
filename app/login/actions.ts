@@ -6,10 +6,13 @@ import {
   PASSWORD_REGEX_ERROR,
 } from "@/lib/constants";
 import z from "zod";
-import { required } from "zod/mini";
 
-interface ILogin {
-  errors: string[];
+interface ILogInState {
+  fieldErrors?: {
+    email?: string[];
+    password?: string[];
+  };
+  data?: any;
 }
 
 const formSchema = z.object({
@@ -23,16 +26,29 @@ const formSchema = z.object({
     .regex(PASSWORD_REGEX, PASSWORD_REGEX_ERROR),
 });
 
-export const login = async (prevState: ILogin | null, FormData: FormData) => {
+//dispatch function
+export const logInState = async (
+  prevState: ILogInState | null,
+  formData: FormData,
+): Promise<ILogInState | null> => {
   const data = {
-    email: FormData.get("email"),
-    password: FormData.get("password"),
+    email: formData.get("email"),
+    password: formData.get("password"),
   };
+
+  //data를 formSchema로 parse
   const result = formSchema.safeParse(data);
+  console.log(result.data);
   if (!result.success) {
     const flatten = z.flattenError(result.error);
+    console.log("에러:", flatten.fieldErrors);
     return {
       fieldErrors: flatten.fieldErrors,
+    };
+  } else {
+    console.log("성공:", result.data);
+    return {
+      data: result.data,
     };
   }
 };
