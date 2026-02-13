@@ -10,8 +10,12 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "@prisma/adapter-better-sqlite3": "^7.4.0",
+    "@prisma/client": "^7.4.0",
     "@tailwindcss/forms": "^0.5.11",
+    "better-sqlite3": "^12.6.2",
     "next": "16.1.6",
+    "prisma": "^7.4.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "validator": "^13.15.26",
@@ -19,6 +23,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
