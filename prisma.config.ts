@@ -8,7 +8,7 @@ export default defineConfig({
   migrations: {
     path: "prisma/migrations",
   },
-  //DB경로 관리
+  //DB경로 관리(prisma7)
   datasource: {
     url: "file:./database.db",
   },
