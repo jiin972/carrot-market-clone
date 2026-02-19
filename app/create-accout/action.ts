@@ -2,13 +2,17 @@
 
 import { PASSWORD_MIN_LENGTH } from "@/lib/constants";
 import db from "@/lib/db";
+import bcrypt from "bcrypt";
+import { getIronSession } from "iron-session";
+import { cookies } from "next/headers";
 import { z } from "zod";
+import { redirect } from "next/navigation";
 
 const checkUsername = (username: string) => !username.includes("potato");
 const checkPassword = ({ password, confirm_password }: any) =>
   password === confirm_password;
 
-//db validation
+//DB validation
 const checkUniqueUsername = async (username: string) => {
   const user = await db.user.findUnique({
     where: {
@@ -19,11 +23,7 @@ const checkUniqueUsername = async (username: string) => {
       id: true,
     },
   });
-  // if (user) {
-  //   return false;
-  // } else {
-  //   return true;
-  // }
+  // user등록여부 확인, 논리부정 연산
   // return user ? false : true;
   return !Boolean(user);
 };
@@ -47,7 +47,6 @@ const formSchema = z
       .string()
       .min(1, "필수 입력입니다.")
       .min(5, "5자 이상으로 입력합니다.")
-      // .max(10, "10자 이하로 입력합니다.")
       .trim()
       .refine(checkUsername)
       .refine(checkUniqueUsername, "This username is already taken"),
@@ -78,19 +77,33 @@ export const createAccount = async (prevState: any, formData: FormData) => {
     confirm_password: formData.get("confirm_password"),
   };
   const result = await formSchema.safeParseAsync(data);
-  // console.log(result);
   if (!result.success) {
     const flatten = z.flattenError(result.error);
     return {
       fieldErrors: flatten.fieldErrors,
     };
   } else {
-  }
+    // paswword Hashig(promise type)
+    const hashedPassword = await bcrypt.hash(result.data.password, 12);
+    //Save user DB
+    const user = await db.user.create({
+      data: {
+        username: result.data.username,
+        email: result.data.email,
+        password: hashedPassword,
+      },
+      select: {
+        id: true,
+      },
+    });
+    const cookie = await getIronSession(await cookies(), {
+      cookieName: "delicious-karrot",
+      password: process.env.COOKIE_PASSWORD!,
+    });
+    //@ts-ignore
+    cookie.id = user.id;
+    await cookie.save();
 
-  // check if username taken.
-  // check if email is already used.
-  // - false -> hash passowrd
-  // save the user to db
-  // log the user in
-  // redirect "/home"
+    redirect("/profile");
+  }
 };
