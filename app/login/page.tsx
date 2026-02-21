@@ -16,13 +16,20 @@ export default function LogIn() {
         <h2 className="text-xl">Log in with email and password.</h2>
       </div>
       <form action={dispatch} className="flex flex-col gap-2 ">
-        <Input name="email" required type="email" placeholder="Email" />
+        <Input
+          name="email"
+          required
+          type="email"
+          placeholder="Email"
+          errors={state?.fieldErrors?.email} //zod가 검증 실패 시 생성한 에러 메시지 배열(Action에서 전달)
+        />
         <Input
           name="password"
           required
           type="password"
           placeholder="Password"
           minLength={PASSWORD_MIN_LENGTH}
+          errors={state?.fieldErrors?.password} //zod가 검증 실패 시 생성한 에러 메시지 배열(Action에서 전달)
         />
         <Button text="Log in" />
       </form>

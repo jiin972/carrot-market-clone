@@ -8,6 +8,7 @@
 - **Styling**: Tailwind CSS v4
 - **Database**: Prisma ORM & SQLite
 - **Validation**: Zod v4 & validator.js
+- **Authentication**: bcrypt, iron-session,
 
 ### 🎯 Key Features & Technical Points
 

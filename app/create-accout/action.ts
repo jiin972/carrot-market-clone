@@ -2,11 +2,10 @@
 
 import { PASSWORD_MIN_LENGTH } from "@/lib/constants";
 import db from "@/lib/db";
+import getSession from "@/lib/session";
 import bcrypt from "bcrypt";
-import { getIronSession } from "iron-session";
-import { cookies } from "next/headers";
-import { z } from "zod";
 import { redirect } from "next/navigation";
+import { z } from "zod";
 
 const checkUsername = (username: string) => !username.includes("potato");
 const checkPassword = ({ password, confirm_password }: any) =>
@@ -76,7 +75,8 @@ export const createAccount = async (prevState: any, formData: FormData) => {
     password: formData.get("password"),
     confirm_password: formData.get("confirm_password"),
   };
-  const result = await formSchema.safeParseAsync(data);
+  // alias safeParseAsyncc = sap
+  const result = await formSchema.spa(data);
   if (!result.success) {
     const flatten = z.flattenError(result.error);
     return {
@@ -85,6 +85,7 @@ export const createAccount = async (prevState: any, formData: FormData) => {
   } else {
     // paswword Hashig(promise type)
     const hashedPassword = await bcrypt.hash(result.data.password, 12);
+
     //Save user DB
     const user = await db.user.create({
       data: {
@@ -96,13 +97,10 @@ export const createAccount = async (prevState: any, formData: FormData) => {
         id: true,
       },
     });
-    const cookie = await getIronSession(await cookies(), {
-      cookieName: "delicious-karrot",
-      password: process.env.COOKIE_PASSWORD!,
-    });
-    //@ts-ignore
-    cookie.id = user.id;
-    await cookie.save();
+    const session = await getSession(); // 사용자 로그인 상태 검사
+    // add to data in session from prisma(data=ID)
+    session.id = user.id;
+    await session.save();
 
     redirect("/profile");
   }
