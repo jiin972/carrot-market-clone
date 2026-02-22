@@ -11,6 +11,10 @@ interface ILogInState {
     email?: string[];
     password?: string[];
   };
+  payload?: {
+    email: string | File | null;
+    password?: string | File | null;
+  };
   data?: any;
 }
 
@@ -57,6 +61,7 @@ export const logInState = async (
     const flatten = z.flattenError(result.error);
     return {
       fieldErrors: flatten.fieldErrors,
+      payload: data,
     };
   } else {
     // if the user is found, check password hash

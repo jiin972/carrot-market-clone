@@ -22,6 +22,7 @@ export default function LogIn() {
           type="email"
           placeholder="Email"
           errors={state?.fieldErrors?.email} //zod가 검증 실패 시 생성한 에러 메시지 배열(Action에서 전달)
+          defaultValue={state?.payload?.email?.toString() ?? ""}
         />
         <Input
           name="password"
@@ -30,6 +31,7 @@ export default function LogIn() {
           placeholder="Password"
           minLength={PASSWORD_MIN_LENGTH}
           errors={state?.fieldErrors?.password} //zod가 검증 실패 시 생성한 에러 메시지 배열(Action에서 전달)
+          defaultValue={state?.payload?.password?.toString() ?? ""}
         />
         <Button text="Log in" />
       </form>

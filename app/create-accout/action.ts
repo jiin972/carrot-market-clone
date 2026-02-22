@@ -5,11 +5,11 @@ import db from "@/lib/db";
 import getSession from "@/lib/session";
 import bcrypt from "bcrypt";
 import { redirect } from "next/navigation";
-import { email, z } from "zod";
+import { z } from "zod";
 
 const checkUsername = (username: string) => !username.includes("potato");
-const checkPassword = ({ password, confirm_password }: any) =>
-  password === confirm_password;
+// const checkPassword = ({ password, confirm_password }: any) =>
+//   password === confirm_password;
 
 //DB validation
 
@@ -85,10 +85,10 @@ export const createAccount = async (prevState: any, formData: FormData) => {
   // alias safeParseAsyncc = sap
   const result = await formSchema.spa(data);
   if (!result.success) {
-    console.log(z.flattenError(result.error));
     const flatten = z.flattenError(result.error);
     return {
       fieldErrors: flatten.fieldErrors,
+      payload: data,
     };
   } else {
     // paswword Hashig(promise type)

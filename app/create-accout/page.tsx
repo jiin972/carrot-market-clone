@@ -23,6 +23,7 @@ export default function CreateAccount() {
           placeholder="Username"
           errors={state?.fieldErrors.username}
           minLength={3}
+          defaultValue={state?.payload.username.toString() ?? ""}
         />
         <Input
           name="email"
@@ -30,6 +31,7 @@ export default function CreateAccount() {
           type="email"
           placeholder="Email"
           errors={state?.fieldErrors.email}
+          defaultValue={state?.payload.email?.toString() ?? ""}
         />
         <Input
           name="password"
@@ -38,6 +40,7 @@ export default function CreateAccount() {
           placeholder="Password"
           errors={state?.fieldErrors.password}
           minLength={PASSWORD_MIN_LENGTH}
+          defaultValue={state?.payload.password?.toString() ?? ""}
         />
         <Input
           name="confirm_password"
@@ -46,6 +49,7 @@ export default function CreateAccount() {
           placeholder="Confirm password"
           errors={state?.fieldErrors.confirm_password}
           minLength={PASSWORD_MIN_LENGTH}
+          defaultValue={state?.payload.confirm_password?.toString() ?? ""}
         />
         <Button text="Create account" />
       </form>
