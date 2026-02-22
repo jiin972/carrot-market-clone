@@ -1,5 +1,5 @@
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
-import { PrismaClient } from "./generated/prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 //어뎁터 생성(prisma7,설정 객체 url필수)
 const adapter = new PrismaBetterSqlite3({

@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js" //프로바이더 js용으로 선택
-  output   = "../lib/generated/prisma"
+  // output   = "../lib/generated/prisma"
 }
 
 datasource db {
