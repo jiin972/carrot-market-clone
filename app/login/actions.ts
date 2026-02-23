@@ -87,6 +87,7 @@ export const logInState = async (
           email: [],
           password: ["Worng password"],
         },
+        payload: data,
       };
     }
     // redirect "/profile"
