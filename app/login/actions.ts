@@ -79,6 +79,7 @@ export const logInState = async (
     if (ok) {
       const session = await getSession();
       session.id = user!.id;
+      await session.save(); //유저 브라우저에 쿠키저장
       redirect("/profile");
     } else {
       return {
