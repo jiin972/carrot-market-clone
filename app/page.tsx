@@ -11,7 +11,7 @@ export default function Home() {
       </div>
       <div className="w-full flex flex-col items-center gap-2 mb-2">
         <Link
-          href="/create-accout"
+          href="/create-account"
           className="btn-primary py-2.5 text-lg hover:no-underline"
         >
           시작하기
