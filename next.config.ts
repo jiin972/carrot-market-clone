@@ -5,6 +5,11 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   images: {
     unoptimized: true, //로컬/외부 이미지 최적화 서버를 우회해 서빙, 리눅스환경문제,배포시 활성화
+    remotePatterns: [
+      {
+        hostname: "avatars.githubusercontent.com", // 해당 주소의 이미지만 최적화 진행
+      },
+    ],
   },
 };
 
