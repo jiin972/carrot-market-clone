@@ -17,7 +17,7 @@ const publicOnlyUrls: Routes = {
 
 //Edge runtime: 모든 요청을 가로채고 초고속 실행, 무거운 작업 불가
 export async function middleware(request: NextRequest) {
-  const session = await getSession();
+  const session = await getSession(); // 페이지 이동마다 쿠키를 호출함
   const exists = publicOnlyUrls[request.nextUrl.pathname];
   //user 로그아웃 상태
   if (!session.id) {
