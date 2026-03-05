@@ -14,6 +14,7 @@ export default async function deleteProduct(productId: number) {
   });
 
   // session.id와 user.id 비교, 틀리면 종료
+  // 서버액션은 조작이 불가능하므로 이곳에서 체크하는 것이 진짜 보안임
   if (!product || product.userId !== session.id) {
     throw new Error("삭제 권한이 없습니다.");
   }
