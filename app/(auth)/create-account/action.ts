@@ -107,8 +107,8 @@ export const createAccount = async (prevState: any, formData: FormData) => {
     });
     const session = await getSession(); // 사용자 로그인 상태 검사
     // add to data in session from prisma(data=ID)
-    session.id = user.id;
-    await session.save();
+    session.id = user.id; //세션 객체에 user의 데이터 기록(쿠키 미전달)
+    await session.save(); //호출 시, 서버가 브라우저에 쿠키 전달
 
     redirect("/profile");
   }

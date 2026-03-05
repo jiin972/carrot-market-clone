@@ -74,6 +74,7 @@ export const logInState = async (
         password: true,
       },
     });
+    //비밀번호 확인(똑같은 salt를 쳐서 DB값과 일치여부 확인)
     const ok = await bcrypt.compare(result.data.password, user!.password ?? "");
     // log the user in
     if (ok) {
