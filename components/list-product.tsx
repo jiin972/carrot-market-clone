@@ -10,7 +10,8 @@ interface ListProductProps {
   id: number;
 }
 
-export default async function ListProduct({
+//목록 내 개별 상품 카드 컴포넌트
+export default function ListProduct({
   title,
   price,
   created_at,
@@ -20,7 +21,7 @@ export default async function ListProduct({
   return (
     <Link href={`/products/${id}`} className="flex gap-5">
       <div className="relative size-35 rounded-md overflow-hidden">
-        <Image fill src={photo} alt={title} />
+        <Image fill src={photo} className="object-cover" alt={title} />
       </div>
       <div className="flex flex-col gap-1 *:text-white">
         <span className="text-xl">{title}</span>
