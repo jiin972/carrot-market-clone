@@ -4,6 +4,7 @@ import db from "@/lib/db";
 import getSession from "@/lib/session";
 import { redirect } from "next/navigation";
 
+//제품 삭제 로직(디테일 페이지 내)
 export default async function deleteProduct(productId: number) {
   const session = await getSession();
 
