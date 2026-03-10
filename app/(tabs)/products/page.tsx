@@ -1,6 +1,8 @@
 import ProductList from "@/components/product-list";
 import db from "@/lib/db";
+import { PlusIcon } from "@heroicons/react/16/solid";
 import { Prisma } from "@prisma/client";
+import Link from "next/link";
 
 //비동기 함수(getProducts)생성 - InitialProduct용
 //db.product를 findMany로 데이터 추출
@@ -34,6 +36,12 @@ export default async function Products() {
   return (
     <div>
       <ProductList initialProducts={initialProducts} />
+      <Link
+        href="/products/add"
+        className="bg-orange-600 flex justify-center items-center rounded-full size-16 fixed bottom-24 right-7 text-white transition-color hover:bg-orange-400"
+      >
+        <PlusIcon className="size-10" />
+      </Link>
     </div>
   );
 }

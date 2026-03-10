@@ -8,9 +8,8 @@ interface InputProps {
 export default function Input({
   errors = [],
   name,
-  ...rest
+  ...rest //name,errors를 제외한 나머지 모든 HTML 속성을 rest객체에 모음
 }: InputProps & InputHTMLAttributes<HTMLInputElement>) {
-  console.log(rest);
   return (
     <div className="flex flex-col  gap-2">
       <input

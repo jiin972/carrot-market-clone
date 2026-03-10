@@ -31,7 +31,7 @@ export default function ProductList({ initialProducts }: ProductListProps) {
           const newProducts = await getMoreProducts(page + 1);
           if (newProducts.length !== 0) {
             setProducts((prev) => [...prev, ...newProducts]); //새 상품을 기존의 상품과 함친 배열을 생성
-            setPage((prev) => prev + 1); //newProduct의 길이가 0이 아니면, 새page추가
+            setPage((prev) => prev + 1); //newProduct의 길이가 0이 아니면, 새page추가, useEffect의 page변화로 코드 재실행됨
           } else {
             setIsLastPage(true); //list.lenth가 0일 경우 lastpage = true
           }
