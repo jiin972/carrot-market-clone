@@ -32,7 +32,7 @@ export async function proxy(request: NextRequest) {
     // 로그인한 user의 이동경로 설정(ex)"/create-account"등 publicOnlyUrls는 제한)
     // 즉, 불필요한 이동은 제한 함
     if (exists) {
-      return NextResponse.redirect(new URL("/products", request.url));
+      return NextResponse.redirect(new URL("/home", request.url));
     }
   }
 }
