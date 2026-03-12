@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import ListProduct from "./list-product";
-import { getMoreProducts } from "@/app/(tabs)/products/action";
-import { InitialProducts } from "@/app/(tabs)/products/page";
+import { getMoreProducts } from "@/app/(tabs)/home/action";
+import { InitialProducts } from "@/app/(tabs)/home/page";
 
 interface ProductListProps {
   initialProducts: InitialProducts; //getInitialProducts의 리턴값 타입을 그대로 가져와서 선언함 (타입 동기화)
