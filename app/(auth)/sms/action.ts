@@ -30,11 +30,11 @@ export const smsLogInState = async (
   if (!prevState.token) {
     const result = phoneSchema.safeParse(phoneData);
     if (!result.success) {
-      const phobeFlatten = z.flattenError(result.error);
-      console.log("폰에러:", phobeFlatten);
+      const phoneFlatten = z.flattenError(result.error);
+      console.log("폰에러:", phoneFlatten);
       return {
         token: false,
-        error: phobeFlatten,
+        error: phoneFlatten,
       };
     } else {
       return {
