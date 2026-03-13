@@ -47,8 +47,8 @@ export default async function Modal({
   if (!product) return;
   return (
     <div className="fixed w-full h-full bg-gray-700/10 flex items-center justify-center left-0 top-0 z-50 backdrop-blur-sm">
-      <div className="relative max-w-3xl h-125 w-full">
-        <CloseButton />
+      <CloseButton />
+      <div className="relative max-w-3xl h-125` w-full">
         <div className="w-full h-full bg-neutral-900 rounded-md flex overflow-hidden shadow-2xl border border-neutral-800">
           {/*사진영역*/}
           <div className=" relative flex-1 bg-neutral-800">
