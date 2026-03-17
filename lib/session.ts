@@ -10,5 +10,8 @@ export default async function getSession() {
   return getIronSession<SessionContent>(await cookies(), {
     cookieName: "delicious-karrot",
     password: process.env.COOKIE_PASSWORD!,
+    cookieOptions: {
+      secure: process.env.NODE_ENV === "production", //배포환경에서만 HTTPS 보안 쿠키 활성화
+    },
   });
 }
