@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 
 //DB data 호출함수
 async function getProduct(productId: number) {
+  "use cache";
   // await new Promise((resolve) => setTimeout(resolve, 1000)); //로딩지연코드, skeletonTest
   const product = await db.product.findUnique({
     where: {
