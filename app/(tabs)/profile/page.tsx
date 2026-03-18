@@ -5,7 +5,7 @@ import { Suspense } from "react";
 
 export default async function Profile() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={"환영합니다. 잠시만 기다려 주세요."}>
       <ProfileContent />
     </Suspense>
   );

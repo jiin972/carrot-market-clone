@@ -2,11 +2,14 @@ import ProductList from "@/components/product-list";
 import db from "@/lib/db";
 import { PlusIcon } from "@heroicons/react/16/solid";
 import { Prisma } from "@prisma/client";
+import { cacheLife } from "next/cache";
 import Link from "next/link";
 
 //비동기 함수(getProducts)생성 - InitialProduct용
 //db.product를 findMany로 데이터 추출
 async function getInitialProducts() {
+  "use cache";
+  cacheLife("minutes");
   const products = await db.product.findMany({
     select: {
       title: true,
