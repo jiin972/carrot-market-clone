@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import getSession from "./lib/session";
+import { getProxySession } from "./lib/session";
 
 //publicOnlyUrls의 interface생성
 interface Routes {
@@ -18,9 +18,10 @@ const publicOnlyUrls: Routes = {
 //middleware에서 proxy로 공식 명칭이 변경됨
 //Edge runtime: 모든 요청을 가로채고 초고속 실행, 무거운 작업 불가
 export async function proxy(request: NextRequest) {
-  const session = await getSession(); // 페이지 이동마다 쿠키를 호출함
+  const session = await getProxySession(request); // 페이지 이동마다 쿠키를 호출함
   const exists = publicOnlyUrls[request.nextUrl.pathname];
-  //user 로그아웃 상태
+
+  //user 로그아웃 상태 → publicOnly 외 접근 차단
   if (!session.id) {
     //로그아웃 user의 이동경로 제한
     if (!exists) {
