@@ -1,6 +1,7 @@
 "use server";
 
 import db from "@/lib/db";
+import { cacheLife } from "next/cache";
 
 /**
  * 상품 목록 페이지 전용 서버 액션
@@ -9,6 +10,8 @@ import db from "@/lib/db";
  **/
 
 export async function getMoreProducts(page: number) {
+  "use cache"; //캐시 사용
+  cacheLife("minutes"); //갱신주기 설정
   const products = await db.product.findMany({
     select: {
       title: true,
