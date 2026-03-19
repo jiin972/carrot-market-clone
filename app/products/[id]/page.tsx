@@ -7,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import deleteProduct from "./action";
+import DeleteButton from "@/components/delete-button";
 
 //동적 metadata생성
 export async function generateMetadata({
@@ -25,11 +26,11 @@ export async function generateMetadata({
 //3. 권한체크(UI용) - 삭제버튼 표시 결정용
 //접속자와 등록자가 일치여부를 확인하는 권한(autorization)체크
 async function getIsOwner(userId: number) {
-  // const session = await getSession(); // 쿠키 읽기
-  // if (session.id) {
-  //   return session.id === userId;
-  // }
-  // return false;
+  const session = await getSession(); // 쿠키 읽기
+  if (session.id) {
+    return session.id === userId;
+  }
+  return false;
 }
 
 //2. DB에서 상품 정보 호출
@@ -88,15 +89,7 @@ export default async function ProductsDeatail({
     return notFound();
   }
   const isOwner = await getIsOwner(product.userId); //getIsOwner의 현재접속자(session.id)와 product.userId 비교
-  //revalidateTag테스트코드
-  const revalidate = async () => {
-    "use server";
-    revalidateTag("update", "max");
-  };
-  const revalidateTitle = async () => {
-    "use server";
-    revalidateTag("products-title", "max");
-  };
+
   return (
     <div>
       <div className="relative aspect-square">
@@ -125,24 +118,12 @@ export default async function ProductsDeatail({
       <div className="p-5">
         <h1 className="text-2xl font-semibold">{product.title}</h1>
         <p>{product.description}</p>
-        <form action={revalidateTitle}>
-          <button className="cursor-pointer">타이틀갱신</button>
-        </form>
-        <form action={revalidate}>
-          <button className="cursor-pointer">상세정보갱신</button>
-        </form>
       </div>
       <div className="fixed w-full bottom-0 left-0 p-5 pb-10 bg-neutral-800 flex justify-between items-center">
         <span className="font-semibold text-lg">
           {formatToWon(product.price)}원
         </span>
-        {/* {isOwner ? (
-          <form action={deleteProduct.bind(null, productId)}>
-            <button className="bg-red-500 p-5 rounded-md text-white font-semibold">
-              Delete Product
-            </button>
-          </form>
-        ) : null} */}
+        {isOwner ? <DeleteButton productId={productId} /> : null}
         <Link
           href={""}
           className="bg-orange-500 p-5 rounded-md text-white font-semibold"

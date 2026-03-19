@@ -2,6 +2,7 @@
 
 import db from "@/lib/db";
 import getSession from "@/lib/session";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 //제품 삭제 로직(디테일 페이지 내)
@@ -19,8 +20,7 @@ export default async function deleteProduct(productId: number) {
   if (!product || product.userId !== session.id) {
     throw new Error("삭제 권한이 없습니다.");
   }
-
   await db.product.delete({ where: { id: productId } });
-
-  return redirect("/");
+  revalidatePath("/home");
+  redirect("/home");
 }
