@@ -53,7 +53,7 @@ export default function ProductList({ initialProducts }: ProductListProps) {
       {products.map((product) => (
         <ListProduct key={product.id} {...product} />
       ))}
-      {/* {!isLastPage ? (
+      {!isLastPage ? (
         <span
           ref={trigger} // current 요소
           className=" text-sm font-semibold bg-orange-500 w-fit mx-auto px-3 py-2 rounded-md hover:opacity-90 active:scale-95"
@@ -62,7 +62,7 @@ export default function ProductList({ initialProducts }: ProductListProps) {
         </span>
       ) : (
         "No more items"
-      )} */}
+      )}
     </div>
   );
 }

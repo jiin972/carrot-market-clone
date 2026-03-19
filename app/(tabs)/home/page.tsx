@@ -9,6 +9,7 @@ import Link from "next/link";
 //db.product를 findMany로 데이터 추출
 async function getInitialProducts() {
   "use cache"; // 캐시 사용
+  "use cache"; // 15분 캐시 - 새 상품 등록시 지연 발생 가능
   cacheLife("minutes"); // 갱신주기 설정
   const products = await db.product.findMany({
     select: {
