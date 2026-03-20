@@ -2,14 +2,16 @@ import ProductList from "@/components/product-list";
 import db from "@/lib/db";
 import { PlusIcon } from "@heroicons/react/16/solid";
 import { Prisma } from "@prisma/client";
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 
 //비동기 함수(getProducts)생성 - InitialProduct용
 //db.product를 findMany로 데이터 추출
 async function getInitialProducts() {
   "use cache"; // 캐시 사용
+  cacheTag("products-list");
   cacheLife("minutes"); // 갱신주기 설정
+  console.log("DB조회 실행");
   const products = await db.product.findMany({
     select: {
       title: true,
@@ -40,18 +42,10 @@ export const metadata = {
 //함수의 비동기화
 //prop은 {...products}의 전개연산자로 db data  전달
 export default async function Products() {
-  const initialProducts = await getInitialProducts(); //최초 페이지만 노출되도록 수정(3/6)
-  //revalidatePath 테스트 코드
-  // const revalidate = async () => {
-  //   "use server";
-  //   revalidatePath("/home");
-  // };
+  const initialProducts = await getInitialProducts();
   return (
     <div>
       <Link href="/home/recent">Recent Products</Link>
-      {/* <form action={revalidate}>
-        <button className="cursor-pointer">데이터 갱신</button>
-      </form> */}
       <ProductList initialProducts={initialProducts} />
       <Link
         href="/home/add"

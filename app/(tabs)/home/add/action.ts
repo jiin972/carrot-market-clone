@@ -3,7 +3,7 @@
 import db from "@/lib/db";
 import getSession from "@/lib/session";
 import fs from "fs/promises";
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import z from "zod";
 
@@ -71,7 +71,7 @@ export async function uploadProduct(prevState: any, formData: FormData) {
           id: true,
         },
       });
-      revalidatePath("/home"); //상품 등록 후, "/home"의 목록 캐시 무효화
+      revalidateTag("products-list", "max"); //상품 등록 후, "/home"의 목록 캐시 무효화
       redirect(`/products/${product.id}`);
     }
   }
