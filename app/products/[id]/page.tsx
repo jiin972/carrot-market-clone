@@ -1,13 +1,14 @@
+import DeleteButton from "@/components/delete-button";
 import db from "@/lib/db";
 import getSession from "@/lib/session";
 import { formatToWon } from "@/lib/util";
 import { UserIcon } from "@heroicons/react/16/solid";
-import { cacheLife, cacheTag, revalidateTag } from "next/cache";
+import { ChevronLeftIcon } from "@heroicons/react/24/outline";
+import { BackwardIcon } from "@heroicons/react/24/solid";
+import { cacheLife, cacheTag } from "next/cache";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import deleteProduct from "./action";
-import DeleteButton from "@/components/delete-button";
 
 //동적 metadata생성
 export async function generateMetadata({
@@ -99,6 +100,11 @@ export default async function ProductsDeatail({
           className="object-cover"
           alt={product.title}
         />
+        <div className="absolute top-4 left-4 bg-black/50 p-2 rounded-full font-semibold">
+          <Link href={"/home"}>
+            <ChevronLeftIcon className="size-6 text-white " />
+          </Link>
+        </div>
       </div>
       <div className="p-5 flex items-center gap-3 border-b border-neutral-700">
         <div className="size-10 rounded-full overflow-hidden">
@@ -115,15 +121,26 @@ export default async function ProductsDeatail({
         </div>
         <h3>{product.user.username}</h3>
       </div>
-      <div className="p-5">
+      <div className="p-5 flex flex-col gap-3">
         <h1 className="text-2xl font-semibold">{product.title}</h1>
-        <p>{product.description}</p>
+        <p className="text-lg">{product.description}</p>
       </div>
+
       <div className="fixed w-full bottom-0 left-0 p-5 pb-10 bg-neutral-800 flex justify-between items-center">
         <span className="font-semibold text-lg">
           {formatToWon(product.price)}원
         </span>
-        {isOwner ? <DeleteButton productId={productId} /> : null}
+        {isOwner ? (
+          <>
+            <Link
+              className="bg-orange-500 p-5 rounded-md text-white font-semibold"
+              href={`/products/${productId}/edit`}
+            >
+              Update Products
+            </Link>
+            <DeleteButton productId={productId} />
+          </>
+        ) : null}
         <Link
           href={""}
           className="bg-orange-500 p-5 rounded-md text-white font-semibold"
