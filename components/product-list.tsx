@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import ListProduct from "./list-product";
 import { getMoreProducts } from "@/app/(tabs)/home/action";
 import { InitialProducts } from "@/app/(tabs)/home/page";
+import { useEffect, useRef, useState } from "react";
+import ListProduct from "./list-product";
 
 interface ProductListProps {
   initialProducts: InitialProducts; //getInitialProducts의 리턴값 타입을 그대로 가져와서 선언함 (타입 동기화)
@@ -16,7 +16,14 @@ export default function ProductList({ initialProducts }: ProductListProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(0);
   const [isLastPage, setIsLastPage] = useState(false);
-  const trigger = useRef<HTMLSpanElement>(null);
+  const trigger = useRef<HTMLSpanElement>(null); //더보기 감지용, 특정Tag직접 선택
+
+  //새 상품 추가시 목록 갱신
+  useEffect(() => {
+    setProducts(initialProducts);
+  }, [initialProducts]);
+
+  //전체 상품목록 = 서버데이터 + 추가로드 데이터
   useEffect(() => {
     //observe의 지침정의
     const observer = new IntersectionObserver(
