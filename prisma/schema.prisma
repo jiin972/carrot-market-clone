@@ -20,6 +20,9 @@ model User {
   updated_at DateTime   @updatedAt
   smstokens  SMSToken[]
   products   Product[]
+  post       Post[] //post는 user가 작성함
+  comments   Comment[] //Comment는 user가 작성함
+  likes      Like[]
 }
 
 model SMSToken {
@@ -39,6 +42,45 @@ model Product {
   photo       String
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
-  user        User     @relation(fields: [userId], references: [id])
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      Int
+}
+
+//Post DB모델 정의
+model Post {
+  id          Int     @id @default(autoincrement())
+  title       String
+  description String?
+  views       Int     @default(0)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade) //Post와 User의 rerationShip정의
+  userId   Int
+  comments Comment[] //Comment는 특정 post에 작성됨
+  likes    Like[]
+}
+
+model Comment {
+  id      Int    @id @default(autoincrement())
+  payload String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  userId     Int //Comment는 user가 작성
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId     Int //Comment는 특정 post에 작성
+  post       Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model Like {
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post       Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId     Int
+  postId     Int
+
+  @@id(name: "id", [userId, postId])
 }
