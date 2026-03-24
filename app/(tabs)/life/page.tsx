@@ -43,7 +43,7 @@ export default async function Life() {
       {posts.map((post) => (
         <Link
           key={post.id}
-          href={`/posts/${post.id}`}
+          href={`/post/${post.id}`} //라우터 경로와 일치확인 필수
           className={`pb-5 mb-5 border-b border-neutral-500 text-neutral-400 flex flex-col
             last:pb-0 last:border-b-0
             `}
