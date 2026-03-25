@@ -4,7 +4,6 @@ import getSession from "@/lib/session";
 import { formatToWon } from "@/lib/util";
 import { UserIcon } from "@heroicons/react/16/solid";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
-import { BackwardIcon } from "@heroicons/react/24/solid";
 import { cacheLife, cacheTag } from "next/cache";
 import Image from "next/image";
 import Link from "next/link";
