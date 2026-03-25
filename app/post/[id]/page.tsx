@@ -1,15 +1,17 @@
 import TimeAgo from "@/components/time-ago";
 import db from "@/lib/db";
 import getSession from "@/lib/session";
-import { EyeIcon, HandThumbUpIcon } from "@heroicons/react/24/solid";
 import { HandThumbUpIcon as OutlineHandThumbUpIcon } from "@heroicons/react/24/outline";
-import { revalidatePath } from "next/cache";
+import { EyeIcon, HandThumbUpIcon } from "@heroicons/react/24/solid";
+import { cacheLife, cacheTag, revalidateTag } from "next/cache";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
-// DB조회 및 data추출
+// DB조회 및 data추출(단, _count:like는 제외함)
 async function getPost(id: number) {
+  "use cache";
+  cacheLife("minutes");
   try {
     const post = await db.post.update({
       where: {
@@ -30,7 +32,6 @@ async function getPost(id: number) {
         _count: {
           select: {
             comments: true,
-            likes: true,
           },
         },
       },
@@ -42,39 +43,43 @@ async function getPost(id: number) {
 }
 
 //현재 로그인한 user가 생성한 like를 찾는 로직
-async function getIsLiked(postId: number) {
-  const session = await getSession();
-  const like = await db.like.findUnique({
+async function getLikeStatus(postId: number, userId: number) {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag(`like-status-${postId}`);
+  const isliked = await db.like.findUnique({
     where: {
       id: {
         //composite ID 호출
         postId: postId,
-        userId: session.id!,
+        userId: userId!,
       },
     },
   });
-  return Boolean(like);
+  //특정 post의 좋아요 총 갯수 가져오기
+  const likeCount = await db.like.count({
+    where: {
+      postId: postId,
+    },
+  });
+  return {
+    likeCount,
+    isLieked: Boolean(isliked),
+  };
 }
 
-export default async function PostDetail({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+async function PostContents({ params }: { params: Promise<{ id: string }> }) {
+  //세션을 가져와 유저검증
+  const session = await getSession();
   const { id } = await params;
   const postId = Number(id);
-
   if (isNaN(postId)) return notFound(); //postId가 숫자가 아닐 경우, 404처리
-
   const post = await getPost(postId);
-  console.log("post조회:", post);
-
   if (!post) return notFound(); //post가 없을 경우(null), 404처리
 
   const likePost = async () => {
-    "use server";
+    "use server"; //form action으로 클라이언트에서 호출되지만, 서버에서 실행되어야 하므로 use server 선언
     try {
-      const session = await getSession();
       await db.like.create({
         data: {
           //composite ID 호출
@@ -82,13 +87,12 @@ export default async function PostDetail({
           userId: session.id!, //미들웨어를 통해 session.id보자(로그인 검증완료)
         },
       });
-      revalidatePath(`/post/${postId}`);
+      revalidateTag(`like-status-${postId}`, { expire: 0 }); //URL에서 온 ID를 Tag의 Id로 사용
     } catch (errors) {}
   };
   const disLikePost = async () => {
     "use server";
     try {
-      const session = await getSession();
       await db.like.delete({
         where: {
           id: {
@@ -98,11 +102,12 @@ export default async function PostDetail({
           },
         },
       });
-      revalidatePath(`/post/${postId}`);
+      revalidateTag(`like-status-${postId}`, { expire: 0 });
     } catch (errors) {}
   };
 
-  const isLiked = await getIsLiked(postId);
+  //리팩터링, session.id를 userId로 전달, getLikeStatus에서 likeCount/isLiked 반환
+  const { likeCount, isLieked } = await getLikeStatus(postId, session.id!);
 
   return (
     <Suspense fallback={"로딩중.."}>
@@ -129,27 +134,39 @@ export default async function PostDetail({
             <EyeIcon className="size-5" />
             <span>조회 {post.views}</span>
           </div>
-          <form action={isLiked ? disLikePost : likePost}>
+          <form action={isLieked ? disLikePost : likePost}>
             <button
               className={`flex items-center gap-2 text-neutral-500 text-sm border border-neutral-400 rounded-full p-2  transition-colors
-                ${isLiked ? "bg-orange-400 text-white font-semibold border-orange-400" : "hover:bg-neutral-800"}
+                ${isLieked ? "bg-orange-400 text-white font-semibold border-orange-400" : "hover:bg-neutral-800"}
                 `}
             >
-              {isLiked ? (
+              {isLieked ? (
                 <>
                   <HandThumbUpIcon className="size-5" />
-                  <span>{post._count.likes}</span>
+                  <span>{likeCount}</span>
                 </>
               ) : (
                 <>
                   <OutlineHandThumbUpIcon className="size-5" />
-                  <span>공감하기({post._count.likes})</span>
+                  <span>공감하기({likeCount})</span>
                 </>
               )}
             </button>
           </form>
         </div>
       </div>
+    </Suspense>
+  );
+}
+
+export default async function PostDetail({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  return (
+    <Suspense fallback={"로딩중.."}>
+      <PostContents params={params} />
     </Suspense>
   );
 }
