@@ -1,3 +1,4 @@
+import CommentSection from "@/components/comment-section";
 import LikeButton from "@/components/like-button";
 import TimeAgo from "@/components/time-ago";
 import db from "@/lib/db";
@@ -42,6 +43,29 @@ async function getPost(id: number) {
   }
 }
 
+// Comment DB모델 조회 및 data 추출 로직 추가(코드챌린지)
+// comment반환(배열)
+async function getComment(postId: number) {
+  "use cache";
+  cacheLife("minutes");
+  //revalidateTag 태그는 마지막에 추가
+
+  const comments = await db.comment.findMany({
+    where: {
+      postId: postId,
+    },
+    include: {
+      user: {
+        select: {
+          username: true,
+          avatar: true,
+        },
+      },
+    },
+  });
+  return comments;
+}
+
 //현재 로그인한 user가 생성한 like를 찾는 로직
 async function getLikeStatus(postId: number, userId: number) {
   "use cache";
@@ -78,8 +102,10 @@ async function PostContents({ params }: { params: Promise<{ id: string }> }) {
   if (!post) return notFound(); //post가 없을 경우(null), 404처리
 
   //리팩터링, session.id를 userId로 전달, getLikeStatus에서 likeCount/isLiked 반환
-  const { likeCount, isLieked } = await getLikeStatus(postId, session.id!);
 
+  const { likeCount, isLieked } = await getLikeStatus(postId, session.id!);
+  //코드챌린지, getComment함수 호출
+  const comments = await getComment(postId);
   return (
     <Suspense fallback={"로딩중.."}>
       <div className="p-5 text-white">
@@ -105,6 +131,7 @@ async function PostContents({ params }: { params: Promise<{ id: string }> }) {
             <EyeIcon className="size-5" />
             <span>조회 {post.views}</span>
           </div>
+          <CommentSection postId={postId} comments={comments} />
           <LikeButton
             isLieked={isLieked}
             likeCount={likeCount}

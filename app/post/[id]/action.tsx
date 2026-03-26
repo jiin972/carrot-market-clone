@@ -38,3 +38,16 @@ export async function disLikePost(postId: number) {
     revalidateTag(`like-status-${postId}`, { expire: 0 });
   } catch (e) {}
 }
+
+//Comment DB모델 변경(쓰기)를 위한 서버액션 코드 구현
+//Props: postId,
+export async function createComponent(postId: number, payload: string) {
+  const session = await getSession();
+  await db.comment.create({
+    data: {
+      postId: postId,
+      userId: session.id!,
+      payload,
+    },
+  });
+}
