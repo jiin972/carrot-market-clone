@@ -1,6 +1,6 @@
 "use client";
 
-import { createComment } from "@/app/post/[id]/action";
+import { createComment, deleteComment } from "@/app/post/[id]/action";
 import { useOptimistic, useTransition } from "react";
 import TimeAgo from "./time-ago";
 
@@ -19,6 +19,7 @@ interface CommentSectionProps {
   }[];
 
   postId: number;
+  userId: number; // 삭제를 위해 session.id porp의 타입 정의
 }
 
 //addOptimiscit(reducerFn)의 payload타입 정의(객체임)
@@ -27,6 +28,7 @@ type Comment = CommentSectionProps["comments"][0]; //[0]= 배열의 첫번째 �
 export default function CommentSection({
   comments,
   postId,
+  userId,
 }: CommentSectionProps) {
   //button 로딩상태 적용
   const [isPending, startTransition] = useTransition();
@@ -89,6 +91,13 @@ export default function CommentSection({
                 <div key={comment.id} className="mt-2 text-xl font-semibold">
                   <span>{comment.payload}</span>
                 </div>
+                {userId === comment.userId && (
+                  <div>
+                    <button onClick={() => deleteComment(comment.id, postId)}>
+                      삭제
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>

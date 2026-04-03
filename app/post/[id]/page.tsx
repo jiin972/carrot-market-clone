@@ -49,6 +49,7 @@ async function getComment(postId: number) {
   "use cache";
   cacheLife("minutes");
   cacheTag(`comments-${postId}`);
+
   //revalidateTag 태그는 마지막에 추가
 
   const comments = await db.comment.findMany({
@@ -132,7 +133,11 @@ async function PostContents({ params }: { params: Promise<{ id: string }> }) {
             <EyeIcon className="size-5" />
             <span>조회 {post.views}</span>
           </div>
-          <CommentSection postId={postId} comments={comments} />
+          <CommentSection
+            postId={postId}
+            comments={comments}
+            userId={session.id!} //삭제를 위해 session.id를 prop으로 전달
+          />
           <LikeButton
             isLieked={isLieked}
             likeCount={likeCount}
