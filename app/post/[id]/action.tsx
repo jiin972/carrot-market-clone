@@ -52,3 +52,16 @@ export async function createComment(postId: number, payload: string) {
   });
   revalidateTag(`comments-${postId}`, { expire: 0 });
 }
+
+//Comment DB모델 변경(삭제)를 위한 서버액션 코드 구현
+//props: commentId
+export async function deleteComment(commentId: number, postId: number) {
+  const session = await getSession();
+  await db.comment.delete({
+    where: {
+      id: commentId, //Number형식, JSX호출시 string변환필요
+      userId: session.id,
+    },
+  });
+  revalidateTag(`comments-${postId}`, { expire: 0 });
+}
