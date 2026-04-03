@@ -4,7 +4,7 @@ import TimeAgo from "@/components/time-ago";
 import db from "@/lib/db";
 import getSession from "@/lib/session";
 import { EyeIcon } from "@heroicons/react/24/solid";
-import { cacheLife, cacheTag, revalidateTag } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -48,6 +48,7 @@ async function getPost(id: number) {
 async function getComment(postId: number) {
   "use cache";
   cacheLife("minutes");
+  cacheTag(`comments-${postId}`);
   //revalidateTag 태그는 마지막에 추가
 
   const comments = await db.comment.findMany({

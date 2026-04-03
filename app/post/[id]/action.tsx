@@ -41,7 +41,7 @@ export async function disLikePost(postId: number) {
 
 //Comment DB모델 변경(쓰기)를 위한 서버액션 코드 구현
 //Props: postId,
-export async function createComponent(postId: number, payload: string) {
+export async function createComment(postId: number, payload: string) {
   const session = await getSession();
   await db.comment.create({
     data: {
@@ -50,4 +50,5 @@ export async function createComponent(postId: number, payload: string) {
       payload,
     },
   });
+  revalidateTag(`comments-${postId}`, { expire: 0 });
 }
