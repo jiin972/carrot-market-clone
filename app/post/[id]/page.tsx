@@ -1,4 +1,5 @@
 import CommentSection from "@/components/comment-section";
+import DeletePost from "@/components/delete-post";
 import LikeButton from "@/components/like-button";
 import TimeAgo from "@/components/time-ago";
 import db from "@/lib/db";
@@ -13,6 +14,7 @@ import { Suspense } from "react";
 async function getPost(id: number) {
   "use cache";
   cacheLife("minutes");
+  cacheTag(`post-${id}`);
   try {
     const post = await db.post.update({
       where: {
@@ -119,11 +121,14 @@ async function PostContents({ params }: { params: Promise<{ id: string }> }) {
             alt={post.user.username}
             className="size-7 rounded-full"
           />
-          <div>
-            <span className="text-sm font-semibold">{post.user.username}</span>
-            <div>
+          <div className="flex items-center justify-between w-full gap-5">
+            <div className="px-1 flex flex-col gap-1">
+              <span className="text-sm font-semibold">
+                {post.user.username}
+              </span>
               <TimeAgo time={post.created_at.toString()} />
             </div>
+            {session.id === post.userId && <DeletePost postId={postId} />}
           </div>
         </div>
         <h2 className="text-lg font-semibold">{post.title}</h2>

@@ -3,6 +3,7 @@
 import db from "@/lib/db";
 import getSession from "@/lib/session";
 import { revalidateTag } from "next/cache";
+import { redirect } from "next/navigation";
 
 //useOptimistic훅 사용을 위해 LikeButton을 "use client"로 생성
 //이때, 서버액션(서버컴포넌트아님)을 외부로부터 import 해와야함
@@ -64,4 +65,19 @@ export async function deleteComment(commentId: number, postId: number) {
     },
   });
   revalidateTag(`comments-${postId}`, { expire: 0 });
+}
+
+//Post DB모델 변경(삭제)를 위한 서버액션 코드 구현
+export async function deletePost(postId: number) {
+  const session = await getSession();
+  await db.post.delete({
+    where: {
+      id: postId,
+      userId: session.id,
+    },
+  });
+  //Post삭제 시
+  revalidateTag("posts", { expire: 0 }); //목록갱신
+  revalidateTag(`post-${postId}`, { expire: 0 }); //상세갱신
+  redirect("/life");
 }
