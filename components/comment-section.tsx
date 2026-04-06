@@ -3,6 +3,7 @@
 import { createComment, deleteComment } from "@/app/post/[id]/action";
 import { useOptimistic, useTransition } from "react";
 import TimeAgo from "./time-ago";
+import Image from "next/image";
 
 interface CommentSectionProps {
   comments: {
@@ -59,6 +60,7 @@ export default function CommentSection({
       await createComment(postId, newComment ?? ""); //action함수 호출
     });
   };
+
   return (
     <>
       {optimisticComments.length > 0 ? (
@@ -71,8 +73,11 @@ export default function CommentSection({
               >
                 <div className="flex items-center gap-5">
                   {comment.user.avatar ? (
-                    <img
+                    <Image
+                      width={28}
+                      height={28}
                       src={comment.user.avatar}
+                      alt={comment.user.username}
                       className="size-7 rounded-full"
                     />
                   ) : (
@@ -92,8 +97,14 @@ export default function CommentSection({
                   <span>{comment.payload}</span>
                 </div>
                 {userId === comment.userId && (
-                  <div>
-                    <button onClick={() => deleteComment(comment.id, postId)}>
+                  <div className="w-full flex items-end justify-end text-sm text-neutral-600">
+                    <button
+                      onClick={() => {
+                        const ok = window.confirm("댓글을 삭제합니까?");
+                        if (ok) deleteComment(comment.id, postId);
+                      }}
+                      className="px-1 border border-neutral-400 bg-neutral-600 text-white rounded-[10px]"
+                    >
                       삭제
                     </button>
                   </div>
