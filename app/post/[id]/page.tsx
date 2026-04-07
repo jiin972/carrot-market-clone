@@ -114,13 +114,22 @@ async function PostContents({ params }: { params: Promise<{ id: string }> }) {
     <Suspense fallback={"로딩중.."}>
       <div className="p-5 text-white">
         <div className="flex items-center gap-2 mb-2">
-          <Image
-            width={28}
-            height={28}
-            src={post.user.avatar ?? ""}
-            alt={post.user.username}
-            className="size-7 rounded-full"
-          />
+          {post.user.avatar ? (
+            <Image
+              width={28}
+              height={28}
+              src={post.user.avatar ?? ""}
+              alt={post.user.username}
+              className="size-7 rounded-full"
+            />
+          ) : (
+            <div className=" flex items-center justify-center size-7 rounded-full bg-neutral-500">
+              <span className=" text-white font-semibold">
+                {post.user.username.charAt(0).toUpperCase()}
+              </span>
+            </div>
+          )}
+
           <div className="flex items-center justify-between w-full gap-5">
             <div className="px-1 flex flex-col gap-1">
               <span className="text-sm font-semibold">
