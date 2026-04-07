@@ -4,12 +4,13 @@ import {
   ChatBubbleBottomCenterIcon,
   HandThumbUpIcon,
 } from "@heroicons/react/24/solid";
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 
 async function getPosts() {
   "use cache";
   cacheLife("minutes");
+  cacheTag("posts");
   // await new Promise((resolve) => setTimeout(resolve, 5000)); //스켈레톤 테스트 코드 작성
   const posts = await db.post.findMany({
     select: {
@@ -39,7 +40,16 @@ export const metadata = {
 export default async function Life() {
   const posts = await getPosts();
   return (
-    <div className="p-5 flex flex-col">
+    <div className="p-5 flex flex-col w-full">
+      <div className="flex justify-end">
+        <Link
+          className="px-4 py-2 flex  mb-5 bg-orange-500 rounded-md text-white font-semibold"
+          href={"/post/create"}
+        >
+          <span>글쓰기</span>
+        </Link>
+      </div>
+
       {posts.map((post) => (
         <Link
           key={post.id}
