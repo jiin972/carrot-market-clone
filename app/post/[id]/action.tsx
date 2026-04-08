@@ -2,7 +2,7 @@
 
 import db from "@/lib/db";
 import getSession from "@/lib/session";
-import { revalidateTag } from "next/cache";
+import { revalidateTag, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
 //useOptimistic훅 사용을 위해 LikeButton을 "use client"로 생성
@@ -64,7 +64,27 @@ export async function deleteComment(commentId: number, postId: number) {
       userId: session.id,
     },
   });
-  revalidateTag(`comments-${postId}`, { expire: 0 });
+  updateTag(`comments-${postId}`);
+}
+
+//Comment DB모델 변경(업데이트)를 위한 서버액션 코드 구현
+export async function updateComment(prevState: any, formData: FormData) {
+  const session = await getSession();
+  const commentId = Number(formData.get("commentId"));
+  const userId = Number(formData.get("userId"));
+  const postId = Number(formData.get("postId"));
+  const payload = formData.get("payload")?.toString();
+  if (!session) return;
+  await db.comment.update({
+    where: {
+      id: commentId,
+      userId: userId,
+    },
+    data: {
+      payload: payload,
+    },
+  });
+  updateTag(`comments-${postId}`);
 }
 
 //Post DB모델 변경(삭제)를 위한 서버액션 코드 구현

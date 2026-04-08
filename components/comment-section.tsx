@@ -1,9 +1,13 @@
 "use client";
 
-import { createComment, deleteComment } from "@/app/post/[id]/action";
-import { useOptimistic, useTransition } from "react";
-import TimeAgo from "./time-ago";
+import {
+  createComment,
+  deleteComment,
+  updateComment,
+} from "@/app/post/[id]/action";
 import Image from "next/image";
+import { useActionState, useOptimistic, useState, useTransition } from "react";
+import TimeAgo from "./time-ago";
 
 interface CommentSectionProps {
   comments: {
@@ -38,6 +42,9 @@ export default function CommentSection({
     comments,
     (prevState, payload) => [...prevState, payload],
   );
+  //댓글 수정을 위한 state
+  const [isEditing, setIsEditing] = useState(false);
+  const [state, dispatch] = useActionState(updateComment, null);
 
   const onSubmit = async (data: FormData) => {
     startTransition(async () => {
@@ -97,16 +104,40 @@ export default function CommentSection({
                   <span>{comment.payload}</span>
                 </div>
                 {userId === comment.userId && (
-                  <div className="w-full flex items-end justify-end text-sm text-neutral-600">
-                    <button
-                      onClick={() => {
-                        const ok = window.confirm("댓글을 삭제합니까?");
-                        if (ok) deleteComment(comment.id, postId);
-                      }}
-                      className="px-1 border border-neutral-400 bg-neutral-600 text-white rounded-[10px]"
-                    >
-                      삭제
-                    </button>
+                  <div className="w-full flex items-end justify-end text-sm text-neutral-600 gap-3">
+                    {isEditing ? (
+                      <form action={dispatch}>
+                        <input name="payload" defaultValue={comment.payload} />
+                        <input
+                          type="hidden"
+                          name="commentId"
+                          value={comment.id}
+                        />
+                        <input type="hidden" name="postId" value={postId} />
+                        <button onClick={() => setIsEditing(false)}>
+                          완료
+                        </button>
+                      </form>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => setIsEditing(true)}
+                          className="text-white hover:text-neutral-500 cursor-pointer"
+                        >
+                          수정
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            const ok = window.confirm("댓글을 삭제합니까?");
+                            if (ok) deleteComment(comment.id, postId);
+                          }}
+                          className="text-white hover:text-neutral-500 cursor-pointer"
+                        >
+                          삭제
+                        </button>
+                      </>
+                    )}
                   </div>
                 )}
               </div>
