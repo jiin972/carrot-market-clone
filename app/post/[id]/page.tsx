@@ -7,6 +7,7 @@ import getSession from "@/lib/session";
 import { EyeIcon } from "@heroicons/react/24/solid";
 import { cacheLife, cacheTag } from "next/cache";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
@@ -137,7 +138,18 @@ async function PostContents({ params }: { params: Promise<{ id: string }> }) {
               </span>
               <TimeAgo time={post.created_at.toString()} />
             </div>
-            {session.id === post.userId && <DeletePost postId={postId} />}
+
+            {session.id === post.userId && (
+              <div className="flex items-center gap-3">
+                <Link
+                  href={`/post/${postId}/edit`}
+                  className="text-sm cursor-pointer hover:text-orange-300"
+                >
+                  Edit
+                </Link>
+                <DeletePost postId={postId} />
+              </div>
+            )}
           </div>
         </div>
         <h2 className="text-lg font-semibold">{post.title}</h2>
@@ -152,11 +164,19 @@ async function PostContents({ params }: { params: Promise<{ id: string }> }) {
             comments={comments}
             userId={session.id!} //삭제를 위해 session.id를 prop으로 전달
           />
+        </div>
+        <div className="mt-5 flex justify-between items-center">
           <LikeButton
             isLieked={isLieked}
             likeCount={likeCount}
             postId={postId}
           />
+          <Link
+            href={"/life"}
+            className="px-2 py-1 bg-neutral-600 rounded-md text-white text-sm"
+          >
+            목록으로
+          </Link>
         </div>
       </div>
     </Suspense>
