@@ -17,7 +17,7 @@ export default function DeletePost({ postId }: DeletePostProps) {
     <div>
       <button
         onClick={handleDelete}
-        className="bg-red-500 px-1 rounded-md text-white text-sm font-semibold"
+        className="text-sm text-orange-500 cursor-pointer hover:text-orange-300"
       >
         Delete
       </button>
