@@ -23,6 +23,9 @@ model User {
   post       Post[] //post는 user가 작성함
   comments   Comment[] //Comment는 user가 작성함
   likes      Like[]
+  chatRoom   ChatRoom?  @relation(fields: [chatRoomId], references: [id])
+  chatRoomId String?
+  messages   Message[]
 }
 
 model SMSToken {
@@ -83,4 +86,26 @@ model Like {
   postId     Int
 
   @@id(name: "id", [userId, postId])
+}
+
+model ChatRoom {
+  id   String @id @default(cuid()) //예측 불가능한 String ID로 보안 강화
+  user User[] //ChatRoom에 원하는 만큼 user추가 가능
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  messages   Message[]
+}
+
+model Message {
+  id      Int    @id @default(autoincrement())
+  payload String //전달될 메시지
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  room       ChatRoom @relation(fields: [chatRoomId], references: [id]) //특정 chatroom으로 전송
+  user       User     @relation(fields: [userId], references: [id])
+  chatRoomId String
+  userId     Int
 }
