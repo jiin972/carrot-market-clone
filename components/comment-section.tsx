@@ -43,7 +43,7 @@ export default function CommentSection({
     (prevState, payload) => [...prevState, payload],
   );
   //댓글 수정을 위한 state
-  const [isEditing, setIsEditing] = useState(false);
+  const [edtingId, setEditingId] = useState<number | null>(null);
   const [state, dispatch] = useActionState(updateComment, null);
 
   const onSubmit = async (data: FormData) => {
@@ -101,27 +101,47 @@ export default function CommentSection({
                   </div>
                 </div>
                 <div key={comment.id} className="mt-2 text-xl font-semibold">
-                  <span>{comment.payload}</span>
+                  {/*댓글 수정 시 기존 댓글 숨김*/}
+                  <span className={edtingId === comment.id ? "hidden" : ""}>
+                    {comment.payload}
+                  </span>
                 </div>
                 {userId === comment.userId && (
                   <div className="w-full flex items-end justify-end text-sm text-neutral-600 gap-3">
-                    {isEditing ? (
-                      <form action={dispatch}>
-                        <input name="payload" defaultValue={comment.payload} />
+                    {edtingId === comment.id ? (
+                      <form
+                        action={dispatch}
+                        onSubmit={() => setEditingId(null)}
+                        className="w-full flex items-center justify-between gap-3"
+                      >
+                        <input
+                          name="payload"
+                          defaultValue={comment.payload}
+                          className="flex-1 bg-transparent border border-neutral-500 rounded-md"
+                        />
                         <input
                           type="hidden"
                           name="commentId"
                           value={comment.id}
                         />
                         <input type="hidden" name="postId" value={postId} />
-                        <button onClick={() => setIsEditing(false)}>
+                        <input
+                          type="hidden"
+                          name="userId"
+                          value={comment.userId}
+                        />
+
+                        <button
+                          type="submit"
+                          className="px-2 py-1 text-white hover:text-neutral-500 cursor-pointer border border-neutral-500 rounded-md"
+                        >
                           완료
                         </button>
                       </form>
                     ) : (
                       <>
                         <button
-                          onClick={() => setIsEditing(true)}
+                          onClick={() => setEditingId(comment.id)}
                           className="text-white hover:text-neutral-500 cursor-pointer"
                         >
                           수정
@@ -149,6 +169,7 @@ export default function CommentSection({
         <input
           type="text"
           name="payload" //반드시 name을 지정해 줘야함
+          required
           className="w-full flex-1 bg-transparent text-white rounded-md border border-neutral-600 px-2"
         />
         <button

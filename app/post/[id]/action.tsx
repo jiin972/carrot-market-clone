@@ -2,7 +2,7 @@
 
 import db from "@/lib/db";
 import getSession from "@/lib/session";
-import { revalidateTag, updateTag } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
 //useOptimistic훅 사용을 위해 LikeButton을 "use client"로 생성
@@ -44,6 +44,7 @@ export async function disLikePost(postId: number) {
 //Props: postId,
 export async function createComment(postId: number, payload: string) {
   const session = await getSession();
+  if (!session) return;
   await db.comment.create({
     data: {
       postId: postId,
@@ -64,7 +65,7 @@ export async function deleteComment(commentId: number, postId: number) {
       userId: session.id,
     },
   });
-  updateTag(`comments-${postId}`);
+  revalidateTag(`comments-${postId}`, { expire: 0 });
 }
 
 //Comment DB모델 변경(업데이트)를 위한 서버액션 코드 구현
@@ -84,7 +85,7 @@ export async function updateComment(prevState: any, formData: FormData) {
       payload: payload,
     },
   });
-  updateTag(`comments-${postId}`);
+  revalidateTag(`comments-${postId}`, { expire: 0 });
 }
 
 //Post DB모델 변경(삭제)를 위한 서버액션 코드 구현
