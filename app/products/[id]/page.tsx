@@ -1,3 +1,4 @@
+import { createChatRoom } from "@/app/(tabs)/chats/action";
 import DeleteButton from "@/components/delete-button";
 import db from "@/lib/db";
 import getSession from "@/lib/session";
@@ -140,12 +141,14 @@ export default async function ProductsDeatail({
             <DeleteButton productId={productId} />
           </>
         ) : null}
-        <Link
-          href={""}
-          className="bg-orange-500 p-5 rounded-md text-white font-semibold"
-        >
-          채팅하기
-        </Link>
+
+        <form action={createChatRoom}>
+          {/*히든 인풋으로 productId를 action.tsx로 전달*/}
+          <input type="hidden" name="productId" value={productId} />
+          <button className="bg-orange-500 p-5 rounded-md text-white font-semibold">
+            채팅하기
+          </button>
+        </form>
       </div>
     </div>
   );
