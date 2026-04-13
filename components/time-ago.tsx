@@ -7,7 +7,7 @@ import { formatToTimeAgo } from "@/lib/util";
 export default function TimeAgo({ time }: { time: string }) {
   return (
     <div>
-      <span>{formatToTimeAgo(time)}</span>
+      <span className="text-xs">{formatToTimeAgo(time)}</span>
     </div>
   );
 }
