@@ -1,9 +1,9 @@
 import ChatMessagesList from "@/components/chat-messages-list";
+import getSession from "@/lib/session";
 import { Prisma } from "@prisma/client";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { getMessages, getRoom } from "./action";
-import getSession from "@/lib/session";
 
 //user(접속한)가 참여한 채팅방 메시지 목록을 렌더링
 async function ChatRoomContent({
@@ -20,7 +20,10 @@ async function ChatRoomContent({
   const session = await getSession(); //UserId추출을 위한 session검증
   return (
     <div>
-      <ChatMessagesList userId={session.id} initialMessages={initialMessages} />
+      <ChatMessagesList
+        userId={session.id!}
+        initialMessages={initialMessages}
+      />
     </div>
   );
 }
