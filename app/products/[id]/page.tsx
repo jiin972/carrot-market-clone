@@ -1,4 +1,4 @@
-import { createChatRoom } from "@/app/(tabs)/chats/action";
+import { createChatRoom } from "@/app/chats/action";
 import DeleteButton from "@/components/delete-button";
 import db from "@/lib/db";
 import getSession from "@/lib/session";
