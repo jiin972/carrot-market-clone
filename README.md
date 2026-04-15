@@ -9,6 +9,7 @@
 - **Database**: Prisma ORM & SQLite
 - **Validation**: Zod v4 & validator.js
 - **Authentication**: bcrypt, iron-session,
+- **Real-time Communication**: Supabase Realtime
 
 ### 🎯 Key Features & Technical Points
 
