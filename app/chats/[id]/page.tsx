@@ -21,6 +21,7 @@ async function ChatRoomContent({
   return (
     <div>
       <ChatMessagesList
+        chatRoomId={id}
         userId={session.id!}
         initialMessages={initialMessages}
       />
