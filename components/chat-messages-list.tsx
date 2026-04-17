@@ -7,17 +7,23 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import TimeAgo from "./time-ago";
+import { saveMessage } from "@/app/chats/action";
 
 interface ChatMessagesListProps {
   initialMessages: InicialChatMessages;
   userId: number;
   chatRoomId: string;
+  userProfile: {
+    username: string;
+    avatar: string | null;
+  };
 }
 
 export default function ChatMessagesList({
   initialMessages,
   userId,
   chatRoomId,
+  userProfile,
 }: ChatMessagesListProps) {
   const [messages, setMessages] = useState(initialMessages);
   //입력창에 현재 타이핑 중인 텍스트 저장, 초기값("")
@@ -31,8 +37,9 @@ export default function ChatMessagesList({
     } = event;
     setMessage(value);
   };
-  const onSubmit = (event: React.SyntheticEvent) => {
+  const onSubmit = async (event: React.SyntheticEvent) => {
     event.preventDefault();
+    //원본불변원칙에 따라 업데이트진행, prevMsgs와 newMessages의 타입일치
     setMessages((prevMsgs) => [
       ...prevMsgs,
       {
@@ -49,8 +56,19 @@ export default function ChatMessagesList({
     channel.current?.send({
       type: "broadcast",
       event: "message",
-      payload: { message },
+      //prevMsgs 타입과 일치시키기 위해 palyload에 필요한 데이터 담기
+      payload: {
+        id: Date.now(),
+        payload: message,
+        created_at: new Date(),
+        userId,
+        user: {
+          username: userProfile.username,
+          avatar: userProfile?.avatar,
+        },
+      },
     });
+    await saveMessage(message, chatRoomId);
     setMessage("");
   };
   //supabase클라이언트 실행(Realtime채널 구독)
@@ -59,13 +77,17 @@ export default function ChatMessagesList({
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     );
-
+    //chatRoomId(props)로 고유 채널 생성 후 useRef.current에 저장
+    //-> useEffect/onSubmit 함수 간 리렌더링 없이 공유
     channel.current = supabaseClient.channel(`room-${chatRoomId}`);
     channel.current
       .on("broadcast", { event: "message" }, (payload) => {
-        console.log(payload);
+        console.log("패이로드", payload.payload);
+        setMessages((prevMsgs) => [...prevMsgs, payload.payload]);
       })
-      .subscribe();
+      .subscribe((status) => {
+        console.log("구독상태", status);
+      });
     //클린업 함수 적용
     return () => {
       channel.current?.unsubscribe();

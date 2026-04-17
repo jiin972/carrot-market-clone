@@ -4,6 +4,21 @@ import db from "@/lib/db";
 import getSession from "@/lib/session";
 import { redirect } from "next/navigation";
 
+//채팅 메시지 저장을 위한 서버액션 함수 정의
+export async function saveMessage(payload: string, chatRoomId: string) {
+  const session = await getSession();
+  const message = await db.message.create({
+    data: {
+      payload,
+      chatRoomId,
+      userId: session.id!,
+    },
+    select: {
+      id: true,
+    },
+  });
+}
+
 //채팅방 생성을 위한 서버액션 함수 정의
 export async function createChatRoom(formData: FormData) {
   //구매자 sesstion 검증

@@ -3,7 +3,7 @@ import getSession from "@/lib/session";
 import { Prisma } from "@prisma/client";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { getMessages, getRoom } from "./action";
+import { getMessages, getRoom, getUserProfile } from "./action";
 
 //user(접속한)가 참여한 채팅방 메시지 목록을 렌더링
 async function ChatRoomContent({
@@ -18,9 +18,12 @@ async function ChatRoomContent({
   if (!room) return notFound();
   const initialMessages = await getMessages(id); //서버에서 db조회(최초 렌더링 용)
   const session = await getSession(); //UserId추출을 위한 session검증
+  const user = await getUserProfile(); //Username/avatar를 추출하기 위한 함수 호출
+  if (!user) return notFound();
   return (
     <div>
       <ChatMessagesList
+        userProfile={user}
         chatRoomId={id}
         userId={session.id!}
         initialMessages={initialMessages}
