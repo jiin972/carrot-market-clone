@@ -4,6 +4,44 @@ import db from "@/lib/db";
 import getSession from "@/lib/session";
 import { redirect } from "next/navigation";
 
+//내(userId)가 참여한 채팅방을 목록 조회를 위한 함수 정의
+// ChatRoom 목록을 조회(필터링), 이후 각 방에서 렌더링에 필요한 data추출
+export async function getChatRooms() {
+  const session = await getSession();
+  const chatRooms = await db.chatRoom.findMany({
+    where: {
+      users: {
+        some: {
+          id: session.id!, //session.id로 참여한 방만 필터링
+        },
+      },
+    },
+    select: {
+      id: true,
+      created_at: true,
+      updated_at: true,
+      users: {
+        select: {
+          id: true,
+          username: true,
+          avatar: true,
+        },
+      },
+      messages: {
+        select: {
+          payload: true,
+          created_at: true,
+        },
+        orderBy: {
+          created_at: "desc",
+        },
+        take: 1, //마지막 메시지 1개만 take
+      },
+    },
+  });
+  return chatRooms; //chatRoom배열을 반환
+}
+
 //채팅 메시지 저장을 위한 서버액션 함수 정의
 export async function saveMessage(payload: string, chatRoomId: string) {
   const session = await getSession();
@@ -17,6 +55,7 @@ export async function saveMessage(payload: string, chatRoomId: string) {
       id: true,
     },
   });
+  return message;
 }
 
 //채팅방 생성을 위한 서버액션 함수 정의
