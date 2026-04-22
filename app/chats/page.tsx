@@ -16,7 +16,7 @@ export async function Chats() {
         <Link
           key={room.id}
           href={`chats/${room.id}`}
-          className="block transition-all duration-200 hover:scale-105 hover:text-orange-500 active:scale-95"
+          className="block transition-all duration-200 active:scale-95"
         >
           {room.users
             .filter((user) => user.id !== session.id)
@@ -31,6 +31,7 @@ export async function Chats() {
                     alt={user.username}
                     width={40}
                     height={40}
+                    className="size-10 flex shrink-0 items-center justify-center bg-neutral-500 rounded-full"
                   />
                 ) : (
                   <div className="size-10 flex shrink-0 items-center justify-center bg-neutral-500 rounded-full">
