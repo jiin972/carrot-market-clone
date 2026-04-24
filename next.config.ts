@@ -2,6 +2,14 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  experimental: {
+    taint: true,
+  },
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
+  },
   cacheComponents: true, //"use cache" 사용을 위해 설정을 켬
   reactCompiler: true,
   images: {
