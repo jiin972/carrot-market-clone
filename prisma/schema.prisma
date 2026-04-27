@@ -26,6 +26,7 @@ model User {
   chatRoom   ChatRoom?  @relation(fields: [chatRoomId], references: [id])
   chatRoomId String?
   messages   Message[]
+  purchases  Purchase[] //판매완료 여부 역참조
 }
 
 model SMSToken {
@@ -37,16 +38,26 @@ model SMSToken {
   userId     Int
 }
 
+// ProductStatus 에 enum을 통해 정해진 값만 허용
+enum ProductStatus {
+  for_sale
+  reserved
+  sold
+}
+
 model Product {
-  id          Int      @id @default(autoincrement())
+  id          Int           @id @default(autoincrement())
   title       String
   price       Float
   description String
   photo       String
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      Int
+  created_at  DateTime      @default(now())
+  updated_at  DateTime      @updatedAt
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      Int //항상 판매자, 상품 등록 시 결정, 고정값
+  buyerId     Int? //항상 구매자, 처음엔 null/ 구매자 결정시 채워짐
+  status      ProductStatus @default(for_sale) //물건 판매/예약/완료 상태표시
+  purchases   Purchase[]
 }
 
 //Post DB모델 정의
@@ -108,4 +119,14 @@ model Message {
   user       User     @relation(fields: [userId], references: [id])
   chatRoomId String
   userId     Int
+}
+
+//물건 판매완료 처리를 위한 모델정의
+model Purchase {
+  id        Int      @id @default(autoincrement())
+  productId Int //판매된 상품
+  userId    Int //구매한 사람
+  create_at DateTime @default(now())
+  product   Product  @relation(fields: [productId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 }
