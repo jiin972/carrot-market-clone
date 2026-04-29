@@ -1,6 +1,6 @@
 "use client";
 
-import deleteProduct from "@/app/products/[id]/action";
+import { deleteProduct } from "@/app/products/[id]/action";
 
 export default function DeleteButton({ productId }: { productId: number }) {
   const handleDelete = async () => {
@@ -12,7 +12,7 @@ export default function DeleteButton({ productId }: { productId: number }) {
   return (
     <button
       onClick={handleDelete}
-      className="bg-red-500 p-5 rounded-md text-white font-semibold"
+      className="flex items-center bg-red-500 p-1 px-2 rounded-md text-white font-semibold text-sm sm:text-base md:text-lg"
     >
       Delete Product
     </button>
