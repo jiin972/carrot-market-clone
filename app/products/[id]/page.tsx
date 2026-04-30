@@ -135,7 +135,7 @@ export default async function ProductsDeatail({
           )}
         </div>
         <h3>{product.user.username}</h3>
-        {!isOwner && !isBuyer && ProductStatus.reserved && (
+        {!isOwner && !isBuyer && product.status === ProductStatus.reserved && (
           <span className="text-white text-sm border border-neutral-500 rounded-md p-1 px-2 ">
             예약중
           </span>
