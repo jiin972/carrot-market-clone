@@ -1,10 +1,12 @@
 import { createChatRoom } from "@/app/chats/action";
 import DeleteButton from "@/components/delete-button";
+import ProductActions from "@/components/product-actions";
 import db from "@/lib/db";
 import getSession from "@/lib/session";
 import { formatToWon } from "@/lib/util";
 import { UserIcon } from "@heroicons/react/16/solid";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
+import { ProductStatus } from "@prisma/client";
 import { cacheLife, cacheTag } from "next/cache";
 import Image from "next/image";
 import Link from "next/link";
@@ -23,6 +25,15 @@ export async function generateMetadata({
     title: `🥕 ${product?.title}`,
   };
 }
+//4. 권한체크(UI용) - 판매완료 여부 표시 결정용
+//buyerId가 있을 경우, session.id와 일치 여부를 확인하는 권한(autorization)체크
+async function getIsBuyer(buyerId: number) {
+  const session = await getSession();
+  if (session.id) {
+    return session.id === buyerId;
+  }
+  return false;
+}
 
 //3. 권한체크(UI용) - 삭제버튼 표시 결정용
 //접속자와 등록자가 일치여부를 확인하는 권한(autorization)체크
@@ -36,6 +47,7 @@ async function getIsOwner(userId: number) {
 
 //2. DB에서 상품 정보 호출
 //비동기함수로 Db에서 productId로 product를 조회
+//status, buyerId 등 스칼라 필드 자동포함
 async function getProduct(productId: number) {
   "use cache"; //nextCache사용
   cacheTag("update"); //cacheTag 지정
@@ -89,7 +101,10 @@ export default async function ProductsDeatail({
   if (!product) {
     return notFound();
   }
-  const isOwner = await getIsOwner(product.userId); //getIsOwner의 현재접속자(session.id)와 product.userId 비교
+  //getIsOwner의 현재접속자(session.id)와 product.userId 비교
+  const isOwner = await getIsOwner(product.userId);
+  //구매자 여부 확인, buyerId가 Null이면 false반환
+  const isBuyer = product.buyerId ? await getIsBuyer(product.buyerId) : false;
 
   return (
     <div>
@@ -120,35 +135,53 @@ export default async function ProductsDeatail({
           )}
         </div>
         <h3>{product.user.username}</h3>
+        {!isOwner && !isBuyer && ProductStatus.reserved && (
+          <span className="text-white text-sm border border-neutral-500 rounded-md p-1 px-2 ">
+            예약중
+          </span>
+        )}
       </div>
       <div className="p-5 flex flex-col gap-3">
         <h1 className="text-2xl font-semibold">{product.title}</h1>
         <p className="text-lg">{product.description}</p>
       </div>
 
-      <div className="fixed w-full bottom-0 left-0 p-5 pb-10 bg-neutral-800 flex justify-between items-center">
+      <div className="fixed w-full bottom-0 left-0 p-5 pb-10 bg-neutral-800 flex justify-between items-center text-sm sm:text-base md:text-lg">
         <span className="font-semibold text-lg">
           {formatToWon(product.price)}원
         </span>
-        {isOwner ? (
-          <>
-            <Link
-              className="bg-orange-500 p-5 rounded-md text-white font-semibold"
-              href={`/products/${productId}/edit`}
-            >
-              Update Products
-            </Link>
-            <DeleteButton productId={productId} />
-          </>
-        ) : null}
+        <div className="flex items-center gap-2">
+          {isOwner ? (
+            <>
+              <Link
+                className="flex items-center bg-orange-500 p-1 px-2 rounded-md text-white font-semibold"
+                href={`/products/${productId}/edit`}
+              >
+                Update Products
+              </Link>
+              <DeleteButton productId={productId} />
+            </>
+          ) : null}
 
-        <form action={createChatRoom}>
-          {/*히든 인풋으로 productId를 action.tsx로 전달*/}
-          <input type="hidden" name="productId" value={productId} />
-          <button className="bg-orange-500 p-5 rounded-md text-white font-semibold">
-            채팅하기
-          </button>
-        </form>
+          {!isOwner && !isBuyer && (
+            <form action={createChatRoom}>
+              {/*히든 인풋으로 productId를 action.tsx로 전달*/}
+              <input type="hidden" name="productId" value={productId} />
+              <button className="flex items-center bg-orange-500 p-1 px-2 rounded-md text-white font-semibold ">
+                채팅하기
+              </button>
+            </form>
+          )}
+          {(isOwner || isBuyer) && (
+            <ProductActions
+              productId={productId}
+              isOwner={isOwner}
+              isBuyer={isBuyer}
+              status={product.status} //DB에서 조회한 상품의 현재 판매 상태
+              buyerId={product.buyerId}
+            />
+          )}
+        </div>
       </div>
     </div>
   );
