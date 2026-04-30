@@ -2,11 +2,30 @@
 
 import db from "@/lib/db";
 import getSession from "@/lib/session";
-import { revalidatePath } from "next/cache";
+import { ProductStatus } from "@prisma/client";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
+//제품 판매상태 변경로직(디테일 페이지 내)
+export async function updateProductState(
+  productId: number,
+  buyerId: number | null,
+  status: ProductStatus,
+) {
+  const session = await getSession();
+  if (!session.id) return;
+  await db.product.update({
+    where: { id: productId },
+    data: {
+      status: status,
+      buyerId: buyerId,
+    },
+  });
+  revalidateTag("update", { expire: 0 });
+}
+
 //제품 삭제 로직(디테일 페이지 내)
-export default async function deleteProduct(productId: number) {
+export async function deleteProduct(productId: number) {
   const session = await getSession();
 
   // 진짜 주인 DB에서 확인(보안핵심)
