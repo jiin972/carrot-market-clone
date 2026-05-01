@@ -4,6 +4,7 @@ import { Prisma } from "@prisma/client";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { getMessages, getRoom, getUserProfile } from "./action";
+import SellerActions from "@/components/seller-actions";
 
 //user(접속한)가 참여한 채팅방 메시지 목록을 렌더링
 async function ChatRoomContent({
@@ -14,12 +15,19 @@ async function ChatRoomContent({
   // Promise타입인 params를 await로 풀고,
   // id를 구조분해 할당으로 추출
   const { id } = await params;
-  const room = await getRoom(id); // getRoom에서만 권한체크(방 존재여부, 권한체크)
+  const room = await getRoom(id); // getRoom에서만 권한체크(방 존재여부, 권한체크) + 상품정보 호출
   if (!room) return notFound();
   const initialMessages = await getMessages(id); //서버에서 db조회(최초 렌더링 용)
   const session = await getSession(); //UserId추출을 위한 session검증
   const user = await getUserProfile(); //Username/avatar를 추출하기 위한 함수 호출
   if (!user) return notFound();
+
+  //상품의 구매자 확정 및 판매 상태 변경을 위한 로직
+  const isSeller = room.product ? session.id === room.product.userId : false;
+  const productId = room.product?.id ?? null;
+  const opponent = room.users.find((user) => user.id !== session.id); //users배열에서 나 아닌 사람 찾기
+  const opponentId = opponent?.id ?? null;
+  const status = room.product?.status ?? null;
   return (
     <div>
       <ChatMessagesList
@@ -28,6 +36,14 @@ async function ChatRoomContent({
         userId={session.id!}
         initialMessages={initialMessages}
       />
+      <div className="fixed top-0 right-0 p-4">
+        <SellerActions
+          isSeller={isSeller}
+          productId={productId}
+          opponentId={opponentId}
+          status={status}
+        />
+      </div>
     </div>
   );
 }

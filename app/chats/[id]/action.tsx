@@ -1,5 +1,6 @@
 import db from "@/lib/db";
 import getSession from "@/lib/session";
+import { cacheTag } from "next/cache";
 
 //user정보를 db로부터 가져오는 함수 생성
 //가져온 정보를 newMessages의 payload에 전달
@@ -40,6 +41,27 @@ export async function getMessages(chatRoomId: string) {
 }
 
 //특정 채팅방 하나 조회(권한 체크용),권한이 없을 경우 notFound()
+//use cache 사용을 위해 getSession분리
+//캐시용 - 상품/메시지 정보만 사용
+async function getRoomProduct(chatRoomId: string) {
+  "use cache";
+  cacheTag("update");
+  return await db.chatRoom.findUnique({
+    where: {
+      id: chatRoomId,
+    },
+    include: {
+      product: {
+        select: {
+          userId: true,
+          id: true,
+          status: true,
+        },
+      },
+    },
+  });
+}
+//비캐시용 - session 및 users포함
 export async function getRoom(chatRoomId: string) {
   const room = await db.chatRoom.findUnique({
     where: {
@@ -58,6 +80,10 @@ export async function getRoom(chatRoomId: string) {
     //users배열에서 session.id와 일치하는 유저찾기
     const canSee = Boolean(room.users.find((user) => user.id === session.id!));
     if (!canSee) return null;
+    //상품정보 캐시에서 가져오기
+    const roomProduct = await getRoomProduct(room.id);
+    //room과 product를 합쳐 하나의 객체로 반환
+    return { ...room, product: roomProduct?.product };
   }
-  return room;
+  return null; // room이 없을 경우 null반환
 }

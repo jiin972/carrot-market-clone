@@ -80,6 +80,7 @@ export async function createChatRoom(formData: FormData) {
           { id: session.id },
         ],
       },
+      productId: productId, //구매자 지정을 위해 상품아이디 저장
     },
     select: {
       id: true, //생성된 ChatRoom의 Id만 반환
