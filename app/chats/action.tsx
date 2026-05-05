@@ -70,6 +70,18 @@ export async function createChatRoom(formData: FormData) {
       id: productId,
     },
   });
+  //기존의 챗룸 존재여부 확인
+  const existingRoom = await db.chatRoom.findFirst({
+    where: {
+      productId: productId,
+      AND: [
+        { users: { some: { id: product?.userId } } },
+        { users: { some: { id: session.id } } },
+      ],
+    },
+  });
+  if (existingRoom) redirect(`/chats/${existingRoom.id}`); //기존의 chatRoom이 있을경우 redirect
+  //기존의 챗룸 없을 경우 신규 챗룸 생성
   const room = await db.chatRoom.create({
     data: {
       users: {
