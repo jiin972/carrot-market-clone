@@ -105,7 +105,6 @@ export default async function ProductsDeatail({
   const isOwner = await getIsOwner(product.userId);
   //구매자 여부 확인, buyerId가 Null이면 false반환
   const isBuyer = product.buyerId ? await getIsBuyer(product.buyerId) : false;
-
   return (
     <div>
       <div className="relative aspect-square">
@@ -115,11 +114,20 @@ export default async function ProductsDeatail({
           className="object-cover"
           alt={product.title}
         />
-        <div className="absolute top-4 left-4 bg-black/50 p-2 rounded-full font-semibold">
+        <div className="absolute top-4 left-4 bg-black/50 p-2 rounded-full font-semibold z-50">
           <Link href={"/home"}>
             <ChevronLeftIcon className="size-6 text-white " />
           </Link>
         </div>
+        {product.status !== ProductStatus.for_sale && (
+          <div className="absolute  bg-black/40 w-full h-full z-10 font-semibold text-neutral-200 text-2xl">
+            <span className="flex h-full justify-center items-center">
+              {product.status === ProductStatus.reserved
+                ? "예약중"
+                : "판매완료"}
+            </span>
+          </div>
+        )}
       </div>
       <div className="p-5 flex items-center gap-3 border-b border-neutral-700">
         <div className="size-10 rounded-full overflow-hidden">
@@ -135,21 +143,17 @@ export default async function ProductsDeatail({
           )}
         </div>
         <h3>{product.user.username}</h3>
-        {!isOwner && !isBuyer && product.status === ProductStatus.reserved && (
-          <span className="text-white text-sm border border-neutral-500 rounded-md p-1 px-2 ">
-            예약중
-          </span>
-        )}
       </div>
       <div className="p-5 flex flex-col gap-3">
         <h1 className="text-2xl font-semibold">{product.title}</h1>
         <p className="text-lg">{product.description}</p>
       </div>
 
-      <div className="fixed w-full bottom-0 left-0 p-5 pb-10 bg-neutral-800 flex justify-between items-center text-sm sm:text-base md:text-lg">
+      <div className="fixed z-30 w-full bottom-0 left-0 p-5 pb-10 bg-neutral-800 flex justify-between items-center text-sm sm:text-base md:text-lg">
         <span className="font-semibold text-lg">
           {formatToWon(product.price)}원
         </span>
+
         <div className="flex items-center gap-2">
           {isOwner ? (
             <>
@@ -163,7 +167,7 @@ export default async function ProductsDeatail({
             </>
           ) : null}
 
-          {!isOwner && !isBuyer && (
+          {!isOwner && (
             <form action={createChatRoom}>
               {/*히든 인풋으로 productId를 action.tsx로 전달*/}
               <input type="hidden" name="productId" value={productId} />
@@ -175,7 +179,6 @@ export default async function ProductsDeatail({
           {(isOwner || isBuyer) && (
             <ProductActions
               productId={productId}
-              isOwner={isOwner}
               isBuyer={isBuyer}
               status={product.status} //DB에서 조회한 상품의 현재 판매 상태
               buyerId={product.buyerId}

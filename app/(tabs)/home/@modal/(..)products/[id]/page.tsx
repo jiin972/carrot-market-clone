@@ -2,12 +2,15 @@ import CloseButton from "@/components/close-button";
 import db from "@/lib/db";
 import { formatToTimeAgo, formatToWon } from "@/lib/util";
 import { PhotoIcon, UserIcon } from "@heroicons/react/16/solid";
+import { ProductStatus } from "@prisma/client";
+import { cacheTag } from "next/cache";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
 //DB data 호출함수
 async function getProduct(productId: number) {
   "use cache";
+  cacheTag("update");
   // await new Promise((resolve) => setTimeout(resolve, 1000)); //로딩지연코드, skeletonTest
   const product = await db.product.findUnique({
     where: {
@@ -63,6 +66,15 @@ export default async function Modal({
               />
             ) : (
               <PhotoIcon className="h-28 text-neutral-600" />
+            )}
+            {product.status !== ProductStatus.for_sale && (
+              <div className="absolute bg-black/40 w-full h-full text-2xl text-neutral-200 font-semibold">
+                <span className="flex justify-center items-center h-full">
+                  {product.status === ProductStatus.reserved
+                    ? "예약중"
+                    : "판매완료"}
+                </span>
+              </div>
             )}
           </div>
           {/*정보영역*/}

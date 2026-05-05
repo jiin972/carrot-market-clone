@@ -19,6 +19,7 @@ async function getInitialProducts() {
       created_at: true,
       photo: true,
       id: true,
+      status: true,
     },
     take: 1, // 가져올 수량
     orderBy: {

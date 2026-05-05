@@ -21,7 +21,16 @@ export async function updateProductState(
       buyerId: buyerId,
     },
   });
+  if (status === ProductStatus.sold) {
+    await db.purchase.create({
+      data: {
+        productId: productId,
+        userId: session.id, //구매자Id
+      },
+    });
+  }
   revalidateTag("update", { expire: 0 });
+  revalidateTag("product-list", { expire: 0 });
 }
 
 //제품 삭제 로직(디테일 페이지 내)
