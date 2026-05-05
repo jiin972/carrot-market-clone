@@ -2,6 +2,7 @@
 
 import { updateProductState } from "@/app/products/[id]/action";
 import { ProductStatus } from "@prisma/client";
+import { Span } from "next/dist/trace";
 
 interface ISellerActionsProps {
   isSeller: boolean;
@@ -18,18 +19,27 @@ export default function SellerActions({
 }: ISellerActionsProps) {
   const handleSpecify = async () => {
     if (!productId || !opponentId) return; //null체크
-    await updateProductState(productId, opponentId, ProductStatus.reserved);
+
+    //구매자지정, 취소를 위해 newStatus생성
+    const newStatus =
+      status === ProductStatus.reserved
+        ? ProductStatus.for_sale
+        : ProductStatus.reserved;
+    await updateProductState(productId, opponentId, newStatus);
   };
-  console.log("셀러:", isSeller);
   return (
     <>
       {isSeller && (
         <button
           type="button"
           onClick={handleSpecify}
-          className={`p-1 px-2 text-sm sm:text-base border-none rounded-md ${status === ProductStatus.reserved ? "bg-orange-500" : "bg-neutral-500"} cursor-pointer`}
+          className={`p-1 px-2 text-sm rounded-md border  ${status === ProductStatus.reserved ? "text-white font-semibold border-orange-500" : "text-neutral-500 border-neutral-500 "} cursor-pointer`}
         >
-          구매자지정
+          {status === ProductStatus.reserved ? (
+            <span>지정 취소</span>
+          ) : (
+            <span>구매자 지정</span>
+          )}
         </button>
       )}
     </>
