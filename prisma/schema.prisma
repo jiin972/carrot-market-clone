@@ -23,7 +23,8 @@ model User {
   post       Post[] //post는 user가 작성함
   comments   Comment[] //Comment는 user가 작성함
   likes      Like[]
-  chatRoom   ChatRoom?  @relation(fields: [chatRoomId], references: [id])
+  // chatRoom   ChatRoom?  @relation(fields: [chatRoomId], references: [id])
+  chatRoom   ChatRoom[] //Many-to-Many 로 ChatRoom생성
   chatRoomId String?
   messages   Message[]
   purchases  Purchase[] //판매완료 여부 역참조
