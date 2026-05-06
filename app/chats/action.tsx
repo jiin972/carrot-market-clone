@@ -4,6 +4,23 @@ import db from "@/lib/db";
 import getSession from "@/lib/session";
 import { redirect } from "next/navigation";
 
+export async function deleteChatroom(chatRoomId: string) {
+  const session = await getSession();
+  if (!session.id) return;
+  //연결된 메시지 먼저 삭제
+  //chatRoom에 메시지가 들어있어서 chatRoom삭제불가
+  await db.message.deleteMany({
+    where: { chatRoomId: chatRoomId },
+  });
+  //메시지 삭제 후 채팅방 삭제
+  await db.chatRoom.delete({
+    where: {
+      id: chatRoomId,
+    },
+  });
+  redirect("/chats/");
+}
+
 //내(userId)가 참여한 채팅방을 목록 조회를 위한 함수 정의
 // ChatRoom 목록을 조회(필터링), 이후 각 방에서 렌더링에 필요한 data추출
 export async function getChatRooms() {
@@ -25,6 +42,13 @@ export async function getChatRooms() {
           id: true,
           username: true,
           avatar: true,
+        },
+      },
+      //상품별 채팅방 목록 렌더링을 위해, product정보 가져옴
+      product: {
+        select: {
+          title: true,
+          photo: true,
         },
       },
       messages: {
