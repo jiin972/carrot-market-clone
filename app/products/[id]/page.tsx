@@ -193,7 +193,7 @@ export default async function ProductsDeatail({
 //지정PAGE를 빌드시점에 static으로 생성해줌
 export async function generateStaticParams() {
   "use cache";
-  cacheLife("minutes");
+  cacheLife("seconds");
   const products = await db.product.findMany({
     select: {
       id: true,

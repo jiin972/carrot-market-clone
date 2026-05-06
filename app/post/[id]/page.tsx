@@ -14,7 +14,7 @@ import { Suspense } from "react";
 // DB조회 및 data추출(단, _count:like는 제외함)
 async function getPost(id: number) {
   "use cache";
-  cacheLife("minutes");
+  cacheLife("seconds");
   cacheTag(`post-${id}`);
   try {
     const post = await db.post.update({
@@ -50,7 +50,7 @@ async function getPost(id: number) {
 // comment반환(배열)
 async function getComment(postId: number) {
   "use cache";
-  cacheLife("minutes");
+  cacheLife("seconds");
   cacheTag(`comments-${postId}`);
 
   //revalidateTag 태그는 마지막에 추가
@@ -74,7 +74,7 @@ async function getComment(postId: number) {
 //현재 로그인한 user가 생성한 like를 찾는 로직
 async function getLikeStatus(postId: number, userId: number) {
   "use cache";
-  cacheLife("minutes");
+  cacheLife("seconds");
   cacheTag(`like-status-${postId}`);
   const isliked = await db.like.findUnique({
     where: {

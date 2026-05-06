@@ -3,7 +3,7 @@ import { cacheLife, cacheTag } from "next/cache";
 
 export default async function CreatePost() {
   "use cache";
-  cacheLife("minutes");
+  cacheLife("seconds");
   cacheTag("posts");
   return (
     <div className="p-3 ">

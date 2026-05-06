@@ -9,7 +9,7 @@ import Link from "next/link";
 
 async function getPosts() {
   "use cache";
-  cacheLife("minutes");
+  cacheLife("seconds");
   cacheTag("posts");
   // await new Promise((resolve) => setTimeout(resolve, 5000)); //스켈레톤 테스트 코드 작성
   const posts = await db.post.findMany({

@@ -10,7 +10,7 @@ import Link from "next/link";
 async function getInitialProducts() {
   "use cache"; // 캐시 사용
   cacheTag("products-list");
-  cacheLife("minutes"); // 갱신주기 설정
+  cacheLife("seconds"); // 갱신주기 설정
   console.log("DB조회 실행");
   const products = await db.product.findMany({
     select: {

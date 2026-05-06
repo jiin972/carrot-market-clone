@@ -11,7 +11,7 @@ import { cacheLife } from "next/cache";
 
 export async function getMoreProducts(page: number) {
   "use cache"; //캐시 사용
-  cacheLife("minutes"); //갱신주기 설정
+  cacheLife("seconds"); //갱신주기 설정
   const products = await db.product.findMany({
     select: {
       title: true,
