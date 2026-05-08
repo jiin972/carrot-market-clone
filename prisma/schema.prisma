@@ -28,6 +28,9 @@ model User {
   chatRoomId String?
   messages   Message[]
   purchases  Purchase[] //판매완료 여부 역참조
+
+  reviewsGiven    Review[] @relation("reviewFrom")
+  reviewsReceived Review[] @relation("reviewTo")
 }
 
 model SMSToken {
@@ -60,6 +63,7 @@ model Product {
   status      ProductStatus @default(for_sale) //물건 판매/예약/완료 상태표시
   purchases   Purchase[]
   chatRooms   ChatRoom[] //Procut와 연결된 chatRoom 역참조
+  reviews     Review[]
 }
 
 //Post DB모델 정의
@@ -133,4 +137,21 @@ model Purchase {
   create_at DateTime @default(now())
   product   Product  @relation(fields: [productId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
+}
+
+//리뷰 작성을 위한 모델정의
+model Review {
+  id           Int      @id @default(autoincrement())
+  payload      String
+  rating       Int      @default(0)
+  create_at    DateTime @default(now())
+  //Product와의 관계(어떤 상품에 대한 리뷰인지)
+  productId    Int //DB저장용 숫자
+  product      Product  @relation(fields: [productId], references: [id]) //통로
+  //리뷰 작성자
+  createdById  Int
+  createdBy    User     @relation("reviewFrom", fields: [createdById], references: [id])
+  //리뷰 수신자(상대방 )
+  createdForId Int
+  createdFor   User     @relation("reviewTo", fields: [createdForId], references: [id])
 }
