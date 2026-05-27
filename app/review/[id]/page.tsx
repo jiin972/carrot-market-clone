@@ -2,12 +2,19 @@ import ReviewForm from "@/components/review-form";
 import Image from "next/image";
 import { createReview, getReviewProduct } from "./action";
 import { Suspense } from "react";
+import db from "@/lib/db";
+import getSession from "@/lib/session";
 
 async function ReviewContent({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const productId = Number(id);
+  const session = await getSession();
   const reviewProduct = await getReviewProduct(productId);
-
+  const existingReview = await db.review.findUnique({
+    where: {
+      productId_createdById: { productId: productId, createdById: session.id! },
+    },
+  });
   return (
     <div className="flex flex-col w-full p-5 items-center">
       <div className="flex flex-col  gap-5">
@@ -20,12 +27,18 @@ async function ReviewContent({ params }: { params: Promise<{ id: string }> }) {
         />
         <div className="text-lg font-semibold">{reviewProduct.title}</div>
       </div>
-      <ReviewForm
-        action={createReview}
-        productId={productId}
-        sellerId={reviewProduct.userId}
-        sellerName={reviewProduct.user.username}
-      />
+      {existingReview ? (
+        <div>
+          <span>리뷰작성완료</span>
+        </div>
+      ) : (
+        <ReviewForm
+          action={createReview}
+          productId={productId}
+          sellerId={reviewProduct.userId}
+          sellerName={reviewProduct.user.username}
+        />
+      )}
     </div>
   );
 }

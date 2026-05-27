@@ -2,7 +2,8 @@
 
 import db from "@/lib/db";
 import getSession from "@/lib/session";
-import { notFound } from "next/navigation";
+import { revalidateTag } from "next/cache";
+import { notFound, redirect } from "next/navigation";
 import z from "zod";
 
 export async function getReviewProduct(id: number) {
@@ -42,6 +43,15 @@ export async function createReview(formData: FormData) {
   //     payload: data,
   //   };
   // }
+  const exists = await db.review.findUnique({
+    where: {
+      productId_createdById: {
+        productId: result.data.productId,
+        createdById: session.id,
+      },
+    },
+  });
+  if (exists) return;
   const review = await db.review.create({
     data: {
       payload: result.data.payload,
@@ -51,4 +61,5 @@ export async function createReview(formData: FormData) {
       createdForId: result.data.sellerId,
     },
   });
+  redirect("/profile");
 }
