@@ -154,4 +154,7 @@ model Review {
   //리뷰 수신자(상대방 )
   createdForId Int
   createdFor   User     @relation("reviewTo", fields: [createdForId], references: [id])
+
+  //복합unique사용(해당 필드 조합이 테이블 전체에 하나만 존재)
+  @@unique([productId, createdById])
 }
