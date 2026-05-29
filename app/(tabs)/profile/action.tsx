@@ -2,6 +2,21 @@ import db from "@/lib/db";
 import getSession from "@/lib/session";
 import { notFound } from "next/navigation";
 
+//판매자가 받은 리뷰 조회
+export async function getReceivedReviews() {
+  const session = await getSession();
+  const soldProducts = await db.review.findMany({
+    where: {
+      createdForId: session.id,
+    },
+    include: {
+      product: true,
+      createdBy: true,
+    },
+  });
+  return soldProducts; //배열을 반환, 데이터활용을 위해 return
+}
+
 //구매목록 조회
 export async function getPurchases() {
   const session = await getSession();
