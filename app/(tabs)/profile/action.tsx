@@ -12,7 +12,17 @@ export async function getPurchases() {
       userId: userId,
     },
     include: {
-      product: true,
+      product: {
+        include: {
+          //내가 쓴 리뷰만 필터링(배열로 반환)
+          //review.length > 0이면 이미 리뷰작성한 상품품
+          reviews: {
+            where: {
+              createdById: session.id,
+            },
+          },
+        },
+      },
       user: true,
     },
   });

@@ -38,12 +38,16 @@ async function ProfileContent() {
             <div className="flex flex-col items-start ">
               <div className="text-sm">판매자 {purchase.user.username}</div>
               {purchase.product.title}
-              <Link
-                className="text-sm bg-orange-500 text-white px-3 py-1 rounded-md0"
-                href={`/review/${purchase.productId}`}
-              >
-                리뷰작성
-              </Link>
+              {purchase.product.reviews.length > 0 ? (
+                <Link href={`/review/${purchase.productId}`}>리뷰보기</Link>
+              ) : (
+                <Link
+                  className="text-sm bg-orange-500 text-white px-3 py-1 rounded-md0"
+                  href={`/review/${purchase.productId}`}
+                >
+                  리뷰작성
+                </Link>
+              )}
             </div>
           </div>
         ))}
