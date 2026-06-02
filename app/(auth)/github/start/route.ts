@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+
 export function GET() {
   const baseURL = "https://github.com/login/oauth/authorize";
   //파라메터 작성, 값은 string
@@ -10,5 +12,5 @@ export function GET() {
   const formattedParams = new URLSearchParams(params).toString();
   const finalURL = `${baseURL}?${formattedParams}`;
 
-  return Response.redirect(finalURL);
+  return redirect(finalURL);
 }
