@@ -1,14 +1,34 @@
 "use server";
+import db from "@/lib/db";
 import { redirect } from "next/navigation";
 import validator from "validator";
 import { z } from "zod";
+import crypto from "crypto";
 
 export interface ISmsLogInState {
   token: boolean;
   error?: z.ZodFlattenedError<string | number>;
 }
-//prevState 타입정의하기
 
+//토큰 생성 함수 createToken()
+async function createToken() {
+  const token = crypto.randomInt(100000, 999999).toString();
+  const existToken = await db.sMSToken.findUnique({
+    where: {
+      token: token,
+    },
+    select: {
+      id: true,
+    },
+  });
+  if (existToken) {
+    return createToken(); // 중복 토큰 존재 시 재귀 호출로 삭제하지 않고 새 토큰 생성
+  } else {
+    return token; //중복 token이 없을 경우 token 반환
+  }
+}
+
+//prevState 타입정의하기
 const phoneSchema = z
   .string()
   .trim()
@@ -37,6 +57,36 @@ export const smsLogInState = async (
         error: phoneFlatten,
       };
     } else {
+      // 기존 토큰 삭제 (같은 phone의 토큰 전부 제거)
+      // 보안 향상 및 DB의 불필요한 데이터 제거
+      await db.sMSToken.deleteMany({
+        where: {
+          user: {
+            phone: result.data, // Zod로 검증된 안전한 전화번호 데이터
+          },
+        },
+      });
+      // create token 로직
+      const token = await createToken();
+      await db.sMSToken.create({
+        data: {
+          token: token,
+          user: {
+            //유저 있으면 기존 유저와 connect
+            connectOrCreate: {
+              where: {
+                phone: result.data,
+              },
+              //유저 없을 경우 새 유저 create 후 연결
+              create: {
+                username: crypto.randomBytes(10).toString("hex"), // NOT NULL, 반드시 함께 생성해 야 함
+                phone: result.data,
+              },
+            },
+          },
+        },
+      });
+      // send the token using twilio
       return {
         token: true,
       };
