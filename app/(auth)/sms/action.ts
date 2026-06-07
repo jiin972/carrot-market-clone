@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import validator from "validator";
 import { z } from "zod";
 import crypto from "crypto";
+import getSession from "@/lib/session";
 
 export interface ISmsLogInState {
   token: boolean;
@@ -37,7 +38,25 @@ const phoneSchema = z
     "Wrong phone format",
   );
 
-const tokenSchema = z.coerce.number().min(100000).max(999999);
+//입력된 토큰의 존재 검증(DB조회)
+async function tokenExist(token: number) {
+  const exists = await db.sMSToken.findUnique({
+    where: {
+      token: token.toString(),
+    },
+    select: {
+      id: true,
+    },
+  });
+  return Boolean(exists); //refine은 truthy or falsy로 통과여부 판단
+}
+
+//입력된 토큰의 형식 검증
+const tokenSchema = z.coerce
+  .number()
+  .min(100000)
+  .max(999999)
+  .refine(tokenExist, "이 토큰은 유효하지 않습니다.");
 
 export const smsLogInState = async (
   prevState: ISmsLogInState,
@@ -93,7 +112,7 @@ export const smsLogInState = async (
     }
   } else {
     //token입력란 표시 이후 단계
-    const result = tokenSchema.safeParse(tokenData);
+    const result = await tokenSchema.safeParseAsync(tokenData); //data검증실행
     if (!result.success) {
       const tokenFlatten = z.flattenError(result.error);
       return {
@@ -102,7 +121,29 @@ export const smsLogInState = async (
       };
     } else {
       //로그인 유지를 위해 아무것도 return하지 않음
-      redirect("/");
+      // get the userId of token
+      const token = await db.sMSToken.findUnique({
+        where: {
+          token: result.data.toString(),
+        },
+        //로그인 + token삭제를 위한 최소한의 값 가져옴
+        select: {
+          id: true, //토큰 삭제용
+          userId: true, //session저장 용
+        },
+      });
+      if (token) {
+        const session = await getSession();
+        session.id = token.userId; //token존재 시 session에 userId 저장(로그인 처리)
+        await session.save(); // 세션 유지
+        //token은 1회용, 바로 삭제
+        await db.sMSToken.delete({
+          where: {
+            id: token.id,
+          },
+        });
+      }
+      redirect("/profile");
     }
   }
 };
