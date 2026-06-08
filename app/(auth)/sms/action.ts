@@ -5,7 +5,6 @@ import validator from "validator";
 import { z } from "zod";
 import crypto from "crypto";
 import getSession from "@/lib/session";
-import { Playwrite_CL_Guides } from "next/font/google";
 
 export interface ISmsLogInState {
   token: boolean;
