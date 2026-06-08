@@ -5,6 +5,7 @@ import validator from "validator";
 import { z } from "zod";
 import crypto from "crypto";
 import getSession from "@/lib/session";
+import { Playwrite_CL_Guides } from "next/font/google";
 
 export interface ISmsLogInState {
   token: boolean;
@@ -105,7 +106,18 @@ export const smsLogInState = async (
           },
         },
       });
-      // send the token using twilio
+      // send the token using twilio(다른 국내SMS 확인 후 변경예정)
+      // const client = twilio(
+      // process.env.TWILIO_ACCOUNT_SID,
+      // process.env.TWILIO_AUTH_TOKEN
+      //);
+      // await client.messages.create({
+      // body:`your karrot verification code is: ${token},`
+      // from: process.env.TWILIO_PHONE_NUMBER!,
+      // to: result.data.MY_PHONE_NUMBER! -> 원래는 result.data, parse된 전화번
+      //})
+      //
+      console.log(token);
       return {
         token: true,
       };
