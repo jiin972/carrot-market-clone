@@ -39,10 +39,15 @@ const phoneSchema = z
   );
 
 //입력된 토큰의 존재 검증(DB조회)
-async function tokenExist(token: number) {
+// token외 Phone도 검증항목에 추가(코드챌린지)
+async function tokenExist(token: number, phone: string) {
   const exists = await db.sMSToken.findUnique({
     where: {
-      token: token.toString(),
+      //복합유니크 키 사용
+      token_phone: {
+        token: token.toString(),
+        phone: phone,
+      },
     },
     select: {
       id: true,
@@ -51,19 +56,23 @@ async function tokenExist(token: number) {
   return Boolean(exists); //refine은 truthy or falsy로 통과여부 판단
 }
 
-//입력된 토큰의 형식 검증
-const tokenSchema = z.coerce
-  .number()
-  .min(100000)
-  .max(999999)
-  .refine(tokenExist, "이 토큰은 유효하지 않습니다.");
-
 export const smsLogInState = async (
   prevState: ISmsLogInState,
   formData: FormData,
 ): Promise<ISmsLogInState> => {
   const phoneData = formData.get("phone");
   const tokenData = formData.get("token"); //formData에서 받아온 6자리 숫자
+
+  if (!phoneData) return { token: false };
+  //입력된 토큰의 형식 검증
+  const tokenSchema = z.coerce
+    .number()
+    .min(100000)
+    .max(999999)
+    .refine(
+      (token) => tokenExist(token, phoneData as string),
+      "이 토큰은 유효하지 않습니다.",
+    );
 
   //UI표시(token입력란) 여부 결정 단계
   if (!prevState.token) {
@@ -90,6 +99,7 @@ export const smsLogInState = async (
       await db.sMSToken.create({
         data: {
           token: token,
+          phone: result.data, // 입력,검증완료된 결과(코드챌린지)
           user: {
             //유저 있으면 기존 유저와 connect
             connectOrCreate: {
