@@ -10,18 +10,4 @@ const adapter = new PrismaBetterSqlite3({
 //클라이언트 생성(어탭터 주입)
 const db = new PrismaClient({ adapter });
 
-const testToken = async () => {
-  const token = await db.sMSToken.findUnique({
-    where: {
-      id: 1,
-    },
-    include: {
-      user: true,
-    },
-  });
-  console.log(token);
-};
-
-testToken();
-
 export default db;
