@@ -1,5 +1,5 @@
 import { formatToTimeAgo, formatToWon } from "@/lib/util"; //가격표기 변경 함수
-import { ProductStatus } from "@prisma/client";
+// import { ProductStatus } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -9,7 +9,7 @@ interface ListProductProps {
   created_at: Date;
   photo: string;
   id: number;
-  status: ProductStatus;
+  status: "for_sale" | "reserved" | "sold";
 }
 
 //목록 내 개별 상품 카드 컴포넌트
@@ -23,18 +23,18 @@ export default function ListProduct({
 }: ListProductProps) {
   return (
     <Link href={`/products/${id}`} className="flex gap-5">
-      <div className="relative size-35 rounded-md overflow-hidden">
+      <div className="relative size-35 overflow-hidden rounded-md">
         <Image fill src={photo} className="object-cover" alt={title} />
-        {status !== ProductStatus.for_sale &&
-          (status === ProductStatus.reserved ? (
-            <div className="absolute  bg-black/40 w-full h-full z-10 font-semibold text-neutral-200 text-2xl">
-              <span className="flex h-full justify-center items-center">
+        {status !== "for_sale" &&
+          (status === "reserved" ? (
+            <div className="absolute z-10 h-full w-full bg-black/40 text-2xl font-semibold text-neutral-200">
+              <span className="flex h-full items-center justify-center">
                 예약중
               </span>
             </div>
           ) : (
-            <div className="absolute  bg-black/40 w-full h-full z-10 font-semibold text-neutral-200 text-2xl">
-              <span className="flex h-full justify-center items-center">
+            <div className="absolute z-10 h-full w-full bg-black/40 text-2xl font-semibold text-neutral-200">
+              <span className="flex h-full items-center justify-center">
                 판매완료
               </span>
             </div>
