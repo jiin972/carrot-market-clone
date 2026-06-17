@@ -1,6 +1,7 @@
 import ChatMessagesList from "@/components/chat-messages-list";
 import getSession from "@/lib/session";
-import { Prisma } from "@prisma/client";
+// import { Prisma } from "@prisma/client";
+import { ProductStatusType } from "@/types";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { getMessages, getRoom, getUserProfile } from "./action";
@@ -41,7 +42,7 @@ async function ChatRoomContent({
           isSeller={isSeller}
           productId={productId}
           opponentId={opponentId}
-          status={status}
+          status={status as any}
         />
       </div>
     </div>
@@ -49,7 +50,7 @@ async function ChatRoomContent({
 }
 
 //initialMessgaes함수를 타입으로 전환,props로 클라이언트 컴포넌트에 전달
-export type InicialChatMessages = Prisma.PromiseReturnType<typeof getMessages>;
+export type InicialChatMessages = Awaited<ReturnType<typeof getMessages>>;
 
 //Suspens로 감싸 비동기 데이터 로딩 처리 및 ChatRoomContent에 params전달
 export default async function ChatRoomPage({
