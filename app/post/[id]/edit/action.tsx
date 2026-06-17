@@ -4,9 +4,12 @@ import db from "@/lib/db";
 import getSession from "@/lib/session";
 import { revalidateTag } from "next/cache";
 import { notFound, redirect } from "next/navigation";
+import { connection } from "next/server";
 import z from "zod";
 
 export async function getPost(id: number) {
+  //해당 함수 동적환경에서 실행됨을 명시함
+  await connection(); //빌드타임이 아닌 런타임에 실행되도록 함
   const post = await db.post.findUnique({
     where: {
       id: id,
@@ -18,7 +21,7 @@ export async function getPost(id: number) {
       userId: true,
     },
   });
-  if (!post) return notFound();
+  // if (!post) return notFound(); use server안에서 notFound()사용불
   return post;
 }
 
