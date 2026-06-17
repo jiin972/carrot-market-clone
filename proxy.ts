@@ -13,15 +13,16 @@ const publicOnlyUrls: Routes = {
   "/login": true,
   "/sms": true,
   "/create-account": true,
-  "/github/start":true,
-  "/github/complete":true
+  "/github/start": true,
+  "/github/complete": true,
 };
 
 //middleware에서 proxy로 공식 명칭이 변경됨
 //Edge runtime: 모든 요청을 가로채고 초고속 실행, 무거운 작업 불가
 export async function proxy(request: NextRequest) {
   const session = await getProxySession(request); // 페이지 이동마다 쿠키를 호출함
-  const exists = publicOnlyUrls[request.nextUrl.pathname];
+  const pathname = request.nextUrl.pathname;
+  const exists = publicOnlyUrls[pathname];
 
   //user 로그아웃 상태 → publicOnly 외 접근 차단
   if (!session.id) {
@@ -34,15 +35,18 @@ export async function proxy(request: NextRequest) {
   else {
     // 로그인한 user의 이동경로 설정(ex)"/create-account"등 publicOnlyUrls는 제한)
     // 즉, 불필요한 이동은 제한 함
-    if (exists) {
+    // 단, 메인페이지("/")는 로그인 시에도 접근 허용 예외 처리(무한루프방지)
+    if (exists && pathname !== "/") {
       return NextResponse.redirect(new URL("/home", request.url));
     }
+    지;
   }
 }
 
 //특정 파일, url, api에서 middleware제외 되도록 Regex정의
+// 정적파일 이외, api/public이미지 폴더 등도 미들웨어 감사에서 제
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)"],
 
   //특정 경로 검사시
   //matcher:["/", "/profile"]
