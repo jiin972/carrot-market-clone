@@ -1,7 +1,8 @@
 import ProductList from "@/components/product-list";
 import db from "@/lib/db";
 import { PlusIcon } from "@heroicons/react/16/solid";
-import { Prisma } from "@prisma/client";
+import { Metadata } from "next";
+// import { Prisma } from "@prisma/client";
 import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 
@@ -31,12 +32,10 @@ async function getInitialProducts() {
 }
 
 //initialProducts의 타입을 prisma를 이용해 export
-export type InitialProducts = Prisma.PromiseReturnType<
-  typeof getInitialProducts
->;
+export type InitialProducts = Awaited<ReturnType<typeof getInitialProducts>>;
 
 //Home의 메타데이터 생성
-export const metadata = {
+export const metadata: Metadata = {
   title: "Home",
 };
 
@@ -50,7 +49,7 @@ export default async function Products() {
       <ProductList initialProducts={initialProducts} />
       <Link
         href="/home/add"
-        className="bg-orange-600 flex justify-center items-center rounded-full size-16 fixed bottom-24 right-7 text-white transition-color hover:bg-orange-400"
+        className="transition-color fixed right-7 bottom-24 flex size-16 items-center justify-center rounded-full bg-orange-600 text-white hover:bg-orange-400"
       >
         <PlusIcon className="size-10" />
       </Link>
