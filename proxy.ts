@@ -39,7 +39,6 @@ export async function proxy(request: NextRequest) {
     if (exists && pathname !== "/") {
       return NextResponse.redirect(new URL("/home", request.url));
     }
-    지;
   }
 }
 
