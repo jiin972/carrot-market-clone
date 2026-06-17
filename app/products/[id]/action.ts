@@ -2,7 +2,7 @@
 
 import db from "@/lib/db";
 import getSession from "@/lib/session";
-import { ProductStatus } from "@prisma/client";
+// import { ProductStatus } from "@prisma/client";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -10,18 +10,18 @@ import { redirect } from "next/navigation";
 export async function updateProductState(
   productId: number,
   buyerId: number | null,
-  status: ProductStatus,
+  status: "for_sale" | "reserved" | "sold" | null,
 ) {
   const session = await getSession();
   if (!session.id) return;
   await db.product.update({
     where: { id: productId },
     data: {
-      status: status,
+      status: status as any,
       buyerId: buyerId,
     },
   });
-  if (status === ProductStatus.sold) {
+  if (status === "sold") {
     await db.purchase.create({
       data: {
         productId: productId,

@@ -1,13 +1,14 @@
 "use client";
 
 import { updateProductState } from "@/app/products/[id]/action";
+import { ProductStatusType } from "@/types";
 // import { ProductStatus } from "@prisma/client";
 
 interface ISellerActionsProps {
   isSeller: boolean;
   productId: number | null; //nullable
   opponentId: number | null; //nullable
-  status: "for_sale" | "reserved" | "sold" | null;
+  status: ProductStatusType;
 }
 
 export default function SellerActions({
@@ -29,9 +30,9 @@ export default function SellerActions({
         <button
           type="button"
           onClick={handleSpecify}
-          className={`rounded-md border p-1 px-2 text-sm ${status === ProductStatus.reserved ? "border-orange-500 font-semibold text-white" : "border-neutral-500 text-neutral-500"} cursor-pointer`}
+          className={`rounded-md border p-1 px-2 text-sm ${status === "reserved" ? "border-orange-500 font-semibold text-white" : "border-neutral-500 text-neutral-500"} cursor-pointer`}
         >
-          {status === ProductStatus.reserved ? (
+          {status === "reserved" ? (
             <span>지정 취소</span>
           ) : (
             <span>구매자 지정</span>
