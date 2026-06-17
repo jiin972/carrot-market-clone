@@ -2,7 +2,8 @@ import CloseButton from "@/components/close-button";
 import db from "@/lib/db";
 import { formatToTimeAgo, formatToWon } from "@/lib/util";
 import { PhotoIcon, UserIcon } from "@heroicons/react/16/solid";
-import { ProductStatus } from "@prisma/client";
+// import { ProductStatus } from "@prisma/client";
+import { ProductStatusType } from "@/types";
 import { cacheTag } from "next/cache";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -50,12 +51,12 @@ export default async function Modal({
   const product = await getProduct(productId);
   if (!product) return;
   return (
-    <div className="fixed w-full h-full bg-gray-700/10 flex items-center justify-center left-0 top-0 z-50 backdrop-blur-sm">
+    <div className="fixed top-0 left-0 z-50 flex h-full w-full items-center justify-center bg-gray-700/10 backdrop-blur-sm">
       <CloseButton />
-      <div className="relative max-w-3xl h-125` w-full">
-        <div className="w-full h-full bg-neutral-900 rounded-md flex overflow-hidden shadow-2xl border border-neutral-800">
+      <div className="h-125` relative w-full max-w-3xl">
+        <div className="flex h-full w-full overflow-hidden rounded-md border border-neutral-800 bg-neutral-900 shadow-2xl">
           {/*사진영역*/}
-          <div className=" relative flex-1 bg-neutral-800">
+          <div className="relative flex-1 bg-neutral-800">
             {product.photo !== null ? (
               <Image
                 src={product.photo}
@@ -67,18 +68,16 @@ export default async function Modal({
             ) : (
               <PhotoIcon className="h-28 text-neutral-600" />
             )}
-            {product.status !== ProductStatus.for_sale && (
-              <div className="absolute bg-black/40 w-full h-full text-2xl text-neutral-200 font-semibold">
-                <span className="flex justify-center items-center h-full">
-                  {product.status === ProductStatus.reserved
-                    ? "예약중"
-                    : "판매완료"}
+            {product.status !== "for_sale" && (
+              <div className="absolute h-full w-full bg-black/40 text-2xl font-semibold text-neutral-200">
+                <span className="flex h-full items-center justify-center">
+                  {product.status === "reserved" ? "예약중" : "판매완료"}
                 </span>
               </div>
             )}
           </div>
           {/*정보영역*/}
-          <div className="flex-1 flex flex-col justify-between p-6 gap-4">
+          <div className="flex flex-1 flex-col justify-between gap-4 p-6">
             <div className="flex flex-col gap-5">
               <h2 className="text-2xl font-semibold">
                 제품명: {product.title}
@@ -98,13 +97,13 @@ export default async function Modal({
 
                 <div>작성자: {product.user.username}</div>
               </div>
-              <p className="text-neutral-200 border-t w-full pt-5">
+              <p className="w-full border-t pt-5 text-neutral-200">
                 설 명: {product.description}
               </p>
             </div>
             <div>
               <div>판매금액: {formatToWon(product.price)}</div>
-              <span className="text-sm text-neutral-500 mt-auto">
+              <span className="mt-auto text-sm text-neutral-500">
                 등록일: {formatToTimeAgo(product.created_at.toString())}
               </span>
             </div>
