@@ -114,14 +114,14 @@ export default async function ProductsDeatail({
           className="object-cover"
           alt={product.title}
         />
-        <div className="absolute top-4 left-4 bg-black/50 p-2 rounded-full font-semibold z-50">
+        <div className="absolute top-4 left-4 z-50 rounded-full bg-black/50 p-2 font-semibold">
           <Link href={"/home"}>
-            <ChevronLeftIcon className="size-6 text-white " />
+            <ChevronLeftIcon className="size-6 text-white" />
           </Link>
         </div>
         {product.status !== ProductStatus.for_sale && (
-          <div className="absolute  bg-black/40 w-full h-full z-10 font-semibold text-neutral-200 text-2xl">
-            <span className="flex h-full justify-center items-center">
+          <div className="absolute z-10 h-full w-full bg-black/40 text-2xl font-semibold text-neutral-200">
+            <span className="flex h-full items-center justify-center">
               {product.status === ProductStatus.reserved
                 ? "예약중"
                 : "판매완료"}
@@ -129,8 +129,8 @@ export default async function ProductsDeatail({
           </div>
         )}
       </div>
-      <div className="p-5 flex items-center gap-3 border-b border-neutral-700">
-        <div className="size-10 rounded-full overflow-hidden">
+      <div className="flex items-center gap-3 border-b border-neutral-700 p-5">
+        <div className="size-10 overflow-hidden rounded-full">
           {product.user.avatar !== null ? (
             <Image
               src={product.user.avatar}
@@ -144,13 +144,13 @@ export default async function ProductsDeatail({
         </div>
         <h3>{product.user.username}</h3>
       </div>
-      <div className="p-5 flex flex-col gap-3">
+      <div className="flex flex-col gap-3 p-5">
         <h1 className="text-2xl font-semibold">{product.title}</h1>
         <p className="text-lg">{product.description}</p>
       </div>
 
-      <div className="fixed z-30 w-full bottom-0 left-0 p-5 pb-10 bg-neutral-800 flex justify-between items-center text-sm sm:text-base md:text-lg">
-        <span className="font-semibold text-lg">
+      <div className="fixed bottom-0 left-0 z-30 flex w-full items-center justify-between bg-neutral-800 p-5 pb-10 text-sm sm:text-base md:text-lg">
+        <span className="text-lg font-semibold">
           {formatToWon(product.price)}원
         </span>
 
@@ -158,7 +158,7 @@ export default async function ProductsDeatail({
           {isOwner ? (
             <>
               <Link
-                className="flex items-center bg-orange-500 p-1 px-2 rounded-md text-white font-semibold"
+                className="flex items-center rounded-md bg-orange-500 p-1 px-2 font-semibold text-white"
                 href={`/products/${productId}/edit`}
               >
                 Update Products
@@ -171,7 +171,7 @@ export default async function ProductsDeatail({
             <form action={createChatRoom}>
               {/*히든 인풋으로 productId를 action.tsx로 전달*/}
               <input type="hidden" name="productId" value={productId} />
-              <button className="flex items-center bg-orange-500 p-1 px-2 rounded-md text-white font-semibold ">
+              <button className="flex items-center rounded-md bg-orange-500 p-1 px-2 font-semibold text-white">
                 채팅하기
               </button>
             </form>
@@ -199,5 +199,6 @@ export async function generateStaticParams() {
       id: true,
     },
   });
+  if (!products.length) return [{ id: "1" }]; // DB가 비었을 경우 빈배열 생성(빌드에러방어코드)
   return products.map((product) => ({ id: product.id + "" })); //id를 string으로 변환, URL 매칭을 위함
 }
