@@ -1,13 +1,13 @@
 "use client";
 
 import { updateProductState } from "@/app/products/[id]/action";
-import { ProductStatus } from "@prisma/client";
+// import { ProductStatus } from "@prisma/client";
 
 interface ISellerActionsProps {
   isSeller: boolean;
   productId: number | null; //nullable
   opponentId: number | null; //nullable
-  status: ProductStatus | null;
+  status: "for_sale" | "reserved" | "sold" | null;
 }
 
 export default function SellerActions({
@@ -20,10 +20,7 @@ export default function SellerActions({
     if (!productId || !opponentId) return; //null체크
 
     //구매자지정, 취소를 위해 newStatus생성
-    const newStatus =
-      status === ProductStatus.reserved
-        ? ProductStatus.for_sale
-        : ProductStatus.reserved;
+    const newStatus = status === "reserved" ? "for_sale" : "reserved";
     await updateProductState(productId, opponentId, newStatus);
   };
   return (
