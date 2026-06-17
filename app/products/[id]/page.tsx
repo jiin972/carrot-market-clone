@@ -6,18 +6,20 @@ import getSession from "@/lib/session";
 import { formatToWon } from "@/lib/util";
 import { UserIcon } from "@heroicons/react/16/solid";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
-import { ProductStatus } from "@prisma/client";
+// import { ProductStatus } from "@prisma/client";
+import { ProductStatusType } from "@/types";
 import { cacheLife, cacheTag } from "next/cache";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Metadata } from "next";
 
 //동적 metadata생성
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ id: string }>;
-}) {
+}): Promise<Metadata> {
   const { id } = await params;
   const productId = Number(id);
   const product = await getProductTitle(productId); //dataBase에 id를 통한 상품조회 query(요청)
@@ -119,12 +121,10 @@ export default async function ProductsDeatail({
             <ChevronLeftIcon className="size-6 text-white" />
           </Link>
         </div>
-        {product.status !== ProductStatus.for_sale && (
+        {product.status !== "for_sale" && (
           <div className="absolute z-10 h-full w-full bg-black/40 text-2xl font-semibold text-neutral-200">
             <span className="flex h-full items-center justify-center">
-              {product.status === ProductStatus.reserved
-                ? "예약중"
-                : "판매완료"}
+              {product.status === "reserved" ? "예약중" : "판매완료"}
             </span>
           </div>
         )}
