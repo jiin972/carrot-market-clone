@@ -37,7 +37,8 @@ export async function GET(request: NextRequest) {
   //로그인 성공 시 로그인 상태 유지 위해 session호출
   if (user) {
     await createSession(user.id);
-    return redirect("/profile");
+    // return redirect("/profile");
+    return NextResponse.redirect(new URL("/profile", request.url));
   }
   //신규 가입 시 username 중복 확인 로직(DB조회),login은 github의 username
   const existingUsername = await db.user.findUnique({
