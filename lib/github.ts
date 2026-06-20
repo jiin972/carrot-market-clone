@@ -1,3 +1,5 @@
+import { boolean } from "zod";
+
 //code를 받아 acceesToken요청, access_token반환
 export async function getAccessToken(
   code: string,
@@ -42,8 +44,14 @@ export async function getGithubUserEmail(
       Authorization: `Bearer ${access_token}`,
     },
   });
-  const emails: { email: string; primary: boolean }[] =
-    await userEmailResponse.json();
+  const data = await userEmailResponse.json();
+  //GithubAPI가 에러발생시 객체 반환,(정상일 경우 배열 반환)
+  //이때, 반환data가 배열이 아닌 경우,find사용불가(에러발생)
+  // undefined방어코드 작성
+  if (!Array.isArray(data)) {
+    return { primaryEmail: undefined };
+  }
+  const emails: { email: string; primary: boolean }[] = data; //배열확정 시 타입규정
   const primaryEmail = emails.find((email) => email.primary);
-  return { primaryEmail: primaryEmail?.email };
+  return { primaryEmail: primaryEmail?.email }; //email문자열만 반환, 없으면 undefined
 }
