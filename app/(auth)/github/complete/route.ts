@@ -6,7 +6,7 @@ import {
   getGithubUserProfile,
 } from "@/lib/github";
 import { redirect } from "next/navigation";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 // 1단계, Github에 GET 요청으로 콜백
 export async function GET(request: NextRequest) {
@@ -62,5 +62,6 @@ export async function GET(request: NextRequest) {
     },
   });
   await createSession(newUser.id);
-  return redirect("/profile");
+  // return redirect("/profile");
+  return NextResponse.redirect(new URL("/profile", request.url));
 }
